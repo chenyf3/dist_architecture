@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>common-parent</artifactId>
+        <groupId>com.xpay</groupId>
+        <version>1.0-Release</version>
+    </parent>
+
+    <artifactId>web-pms</artifactId>
+    <packaging>pom</packaging>
+    <description>企业内部管理系统，开发时前后端分离，部署时不分离</description>
+
+    <modules>
+        <module>web-pms-view</module><!-- 此模块在前，构建时将先构建此模块 -->
+        <module>web-pms-api</module>
+    </modules>
+</project>

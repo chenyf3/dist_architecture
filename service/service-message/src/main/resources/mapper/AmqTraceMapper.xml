@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.xpay.service.message.entity.AmqTrace">
+	<sql id="table"> tbl_amq_trace </sql>
+
+	<!-- 用于返回的bean对象 -->
+	<resultMap id="BaseResultMap" type="com.xpay.service.message.entity.AmqTrace">
+		<result column="ID" property="id" jdbcType="BIGINT"/>
+		<result column="MSG_TIME" property="msgTime" jdbcType="TIMESTAMP"/>
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="TRACE_ID" property="traceId" jdbcType="CHAR"/>
+		<result column="TRX_NO" property="trxNo" jdbcType="VARCHAR"/>
+		<result column="MCH_NO" property="mchNo" jdbcType="CHAR"/>
+		<result column="TOPIC" property="topic" jdbcType="VARCHAR"/>
+		<result column="TOPIC_GROUP" property="topicGroup" jdbcType="VARCHAR"/>
+		<result column="CONSUME_DEST" property="consumeDest" jdbcType="VARCHAR"/>
+		<result column="TYPE" property="type" jdbcType="TINYINT"/>
+		<result column="MSG_STATUS" property="msgStatus" jdbcType="TINYINT"/>
+		<result column="DELIVERY_COUNT" property="deliveryCount" jdbcType="TINYINT"/>
+		<result column="CLIENT_FLAG" property="clientFlag" jdbcType="VARCHAR"/>
+		<result column="RESEND" property="resend" jdbcType="TINYINT"/>
+		<result column="ERR_MSG" property="errMsg" jdbcType="VARCHAR"/>
+		<result column="ORI_MSG" property="oriMsg" jdbcType="OTHER"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="Base_Column_List">
+		ID,
+		MSG_TIME,
+		CREATE_TIME,
+		TRACE_ID,
+		TRX_NO,
+		MCH_NO,
+		TOPIC,
+		TOPIC_GROUP,
+		CONSUME_DEST,
+		TYPE,
+		MSG_STATUS,
+		DELIVERY_COUNT,
+		CLIENT_FLAG,
+		RESEND,
+		ERR_MSG,
+		ORI_MSG
+	</sql>
+
+	<!-- 插入记录 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="AmqTrace">
+		INSERT INTO <include refid="table" /> (
+        	CREATE_TIME,
+        	MSG_TIME,
+        	TRACE_ID,
+        	TRX_NO,
+        	MCH_NO,
+        	TOPIC,
+        	TOPIC_GROUP,
+        	CONSUME_DEST,
+        	TYPE,
+        	MSG_STATUS,
+        	DELIVERY_COUNT,
+        	CLIENT_FLAG,
+        	RESEND,
+        	ERR_MSG,
+        	ORI_MSG
+        ) VALUES (
+			#{createTime,jdbcType=TIMESTAMP},
+			#{msgTime,jdbcType=TIMESTAMP},
+			#{traceId,jdbcType=CHAR},
+			#{trxNo,jdbcType=VARCHAR},
+			#{mchNo,jdbcType=CHAR},
+			#{topic,jdbcType=VARCHAR},
+			#{topicGroup,jdbcType=VARCHAR},
+			#{consumeDest,jdbcType=VARCHAR},
+			#{type,jdbcType=TINYINT},
+			#{msgStatus,jdbcType=TINYINT},
+			#{deliveryCount,jdbcType=TINYINT},
+			#{clientFlag,jdbcType=VARCHAR},
+			#{resend,jdbcType=TINYINT},
+			#{errMsg,jdbcType=VARCHAR},
+			#{oriMsg,jdbcType=OTHER}
+        )
+	</insert>
+
+	<!-- 批量插入记录 -->
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="id" parameterType="list">
+		INSERT INTO <include refid="table" /> (
+        	CREATE_TIME,
+        	MSG_TIME,
+        	TRACE_ID,
+        	TRX_NO,
+        	MCH_NO,
+        	TOPIC,
+        	TOPIC_GROUP,
+        	CONSUME_DEST,
+        	TYPE,
+        	MSG_STATUS,
+        	DELIVERY_COUNT,
+        	CLIENT_FLAG,
+        	RESEND,
+        	ERR_MSG,
+        	ORI_MSG
+        ) VALUES 
+			<foreach collection="list" item="item" separator=",">
+			(
+			#{item.createTime,jdbcType=TIMESTAMP},
+			#{item.msgTime,jdbcType=TIMESTAMP},
+			#{item.traceId,jdbcType=CHAR},
+			#{item.trxNo,jdbcType=VARCHAR},
+			#{item.mchNo,jdbcType=CHAR},
+			#{item.topic,jdbcType=VARCHAR},
+			#{item.topicGroup,jdbcType=VARCHAR},
+			#{item.consumeDest,jdbcType=VARCHAR},
+			#{item.type,jdbcType=TINYINT},
+			#{item.msgStatus,jdbcType=TINYINT},
+			#{item.deliveryCount,jdbcType=TINYINT},
+			#{item.clientFlag,jdbcType=VARCHAR},
+			#{item.resend,jdbcType=TINYINT},
+			#{item.errMsg,jdbcType=VARCHAR},
+			#{item.oriMsg,jdbcType=OTHER}
+			)
+			</foreach>
+	</insert>
+
+	<!-- 更新 -->
+	<update id="update" parameterType="AmqTrace">
+        UPDATE <include refid="table" />
+		<set>
+			CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+			MSG_TIME = #{msgTime,jdbcType=TIMESTAMP},
+			TRACE_ID = #{traceId,jdbcType=CHAR},
+			TRX_NO = #{trxNo,jdbcType=VARCHAR},
+			MCH_NO = #{mchNo,jdbcType=CHAR},
+			TOPIC = #{topic,jdbcType=VARCHAR},
+			TOPIC_GROUP = #{topicGroup,jdbcType=VARCHAR},
+			CONSUME_DEST = #{consumeDest,jdbcType=VARCHAR},
+			TYPE = #{type,jdbcType=TINYINT},
+			MSG_STATUS = #{msgStatus,jdbcType=TINYINT},
+			DELIVERY_COUNT = #{deliveryCount,jdbcType=TINYINT},
+			CLIENT_FLAG = #{clientFlag,jdbcType=VARCHAR},
+			RESEND = #{resend,jdbcType=TINYINT},
+			ERR_MSG = #{errMsg,jdbcType=VARCHAR},
+			ORI_MSG = #{oriMsg,jdbcType=OTHER}
+		</set>
+        WHERE ID = #{id,jdbcType=BIGINT}
+	</update>
+
+	<!-- 只更新不为null的属性 -->
+	<update id="updateIfNotNull" parameterType="AmqTrace">
+		UPDATE <include refid="table" />
+		<set>
+			<if test="createTime != null">
+				CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="msgTime != null">
+				MSG_TIME = #{msgTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="traceId != null">
+				TRACE_ID = #{traceId,jdbcType=CHAR},
+			</if>
+			<if test="trxNo != null">
+				TRX_NO = #{trxNo,jdbcType=VARCHAR},
+			</if>
+			<if test="mchNo != null">
+				MCH_NO = #{mchNo,jdbcType=CHAR},
+			</if>
+			<if test="topic != null">
+				TOPIC = #{topic,jdbcType=VARCHAR},
+			</if>
+			<if test="topicGroup != null">
+				TOPIC_GROUP = #{topicGroup,jdbcType=VARCHAR},
+			</if>
+			<if test="consumeDest != null">
+				CONSUME_DEST = #{consumeDest,jdbcType=VARCHAR},
+			</if>
+			<if test="type != null">
+				TYPE = #{type,jdbcType=TINYINT},
+			</if>
+			<if test="msgStatus != null">
+				MSG_STATUS = #{msgStatus,jdbcType=TINYINT},
+			</if>
+			<if test="deliveryCount != null">
+				DELIVERY_COUNT = #{deliveryCount,jdbcType=TINYINT},
+			</if>
+			<if test="clientFlag != null">
+				CLIENT_FLAG = #{clientFlag,jdbcType=VARCHAR},
+			</if>
+			<if test="resend != null">
+				RESEND = #{resend,jdbcType=TINYINT},
+			</if>
+			<if test="errMsg != null">
+				ERR_MSG = #{errMsg,jdbcType=VARCHAR},
+			</if>
+			<if test="oriMsg != null">
+				ORI_MSG = #{oriMsg,jdbcType=OTHER}
+			</if>
+		</set>
+		WHERE ID = #{id,jdbcType=BIGINT}
+	</update>
+	
+	<!-- 多条件组合查询 -->
+	<select id="listBy" parameterType="java.util.Map" resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+		<choose>
+			<when test="sortColumns != null and sortColumns !='' ">
+				<![CDATA[ ORDER BY ${sortColumns} ]]>
+			</when>
+			<otherwise>
+				<![CDATA[ ORDER BY ID DESC ]]>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 根据多条件组合查询，计算总记录数 -->
+	<select id="countBy" parameterType="java.util.Map" resultType="long">
+		SELECT count(ID) FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+
+	<!-- 按查询条件删除 -->
+	<delete id="deleteBy">
+        DELETE FROM <include refid="table" /> 
+		<where>
+			<include refid="condition_sql" />
+		</where>
+    </delete>
+
+	<!-- 根据多个id查询 -->
+    <select id="listByIdList" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		WHERE ID IN 
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</select>
+
+	<!-- 根据id查询 -->
+    <select id="getById" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" /> 
+		WHERE ID = #{id,jdbcType=BIGINT}  
+	</select>
+
+	<!-- 按id主键删除 -->
+	<delete id="deleteById">
+        DELETE FROM <include refid="table" /> WHERE ID = #{id,jdbcType=BIGINT}
+    </delete>
+
+	<!-- 按多个id主键删除 -->
+	<delete id="deleteByIdList" parameterType="list">
+		DELETE FROM <include refid="table" />
+		WHERE ID IN 
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</delete>
+
+	<!-- ↑↑↑↑↑↑ 如果有新增字段、删除字段、修改字段 以上内容可用模板生成新内容后直接替换 ↑↑↑↑↑↑ -->
+	<!-- ↓↓↓↓↓↓ 以下内容是根据需求手动添加或修改的，请勿使用模板内容直接覆盖 ↓↓↓↓↓↓ -->
+
+	<sql id="condition_sql">
+		<if test="id != null ">
+			AND ID = #{id,jdbcType=BIGINT}
+		</if>
+		<if test="idList != null and idList.size() > 0">
+			AND ID IN <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+		</if>
+		<choose>
+			<when test="msgTimeBegin !=null and msgTimeBegin != '' and msgTimeEnd != null and msgTimeEnd != ''">
+				AND MSG_TIME between #{msgTimeBegin,jdbcType=TIMESTAMP} and #{msgTimeEnd,jdbcType=TIMESTAMP}
+			</when>
+			<when test="msgTimeBegin !=null and msgTimeBegin != ''">
+				AND MSG_TIME &gt;= #{msgTimeBegin,jdbcType=TIMESTAMP}
+			</when>
+			<when test="msgTimeEnd !=null and msgTimeEnd != ''">
+				AND MSG_TIME &lt;= #{msgTimeEnd,jdbcType=TIMESTAMP}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+		<if test="traceId != null and traceId !='' ">
+			AND TRACE_ID = #{traceId,jdbcType=CHAR}
+		</if>
+		<if test="trxNo != null and trxNo !='' ">
+			AND TRX_NO = #{trxNo,jdbcType=VARCHAR}
+		</if>
+		<if test="mchNo != null and mchNo !='' ">
+			AND MCH_NO = #{mchNo,jdbcType=CHAR}
+		</if>
+        <if test="topic != null and topic !='' ">
+            AND (TOPIC = #{topic,jdbcType=VARCHAR} OR TOPIC = CONCAT('VirtualTopic.',#{topic,jdbcType=VARCHAR}))
+        </if>
+		<if test="topicGroup != null and topicGroup !='' ">
+			AND TOPIC_GROUP = #{topicGroup,jdbcType=VARCHAR}
+		</if>
+		<if test="consumeDest != null and consumeDest !='' ">
+			AND CONSUME_DEST = #{consumeDest,jdbcType=VARCHAR}
+		</if>
+		<if test="type != null ">
+			AND TYPE = #{type,jdbcType=TINYINT}
+		</if>
+		<if test="msgStatus != null ">
+			AND MSG_STATUS = #{msgStatus,jdbcType=TINYINT}
+		</if>
+		<if test="deliveryCount != null ">
+			AND DELIVERY_COUNT = #{deliveryCount,jdbcType=TINYINT}
+		</if>
+		<if test="clientFlag != null and clientFlag !='' ">
+			AND CLIENT_FLAG = #{clientFlag,jdbcType=VARCHAR}
+		</if>
+		<if test="resend != null ">
+			AND RESEND = #{resend,jdbcType=TINYINT}
+		</if>
+		<if test="errMsg != null and errMsg !='' ">
+			AND ERR_MSG = #{errMsg,jdbcType=VARCHAR}
+		</if>
+		<if test="oriMsg != null and oriMsg !='' ">
+			AND ORI_MSG = #{oriMsg,jdbcType=OTHER}
+		</if>
+	</sql>
+
+	<!-- 根据traceId查询源消息体 -->
+	<select id="getOriMsgByTraceId" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		WHERE TRACE_ID = #{traceId,jdbcType=CHAR} AND (TYPE = 1 OR (TYPE = 2 AND DELIVERY_COUNT = 1)) limit 1;
+	</select>
+
+	<select id="getFirstConsumeRecordByTraceIdAndClientFlag" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		WHERE TRACE_ID = #{traceId,jdbcType=CHAR} AND CLIENT_FLAG = #{clientFlag,jdbcType=VARCHAR} AND TYPE = 2 AND DELIVERY_COUNT = 1 limit 1;
+	</select>
+	<select id="getLastConsumeRecordByTraceIdAndClientFlag" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		WHERE TRACE_ID = #{traceId,jdbcType=CHAR} AND CLIENT_FLAG = #{clientFlag,jdbcType=VARCHAR} AND TYPE = 2 order by DELIVERY_COUNT desc limit 1;
+	</select>
+</mapper>
+

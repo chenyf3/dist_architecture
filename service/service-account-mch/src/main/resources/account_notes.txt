@@ -1,0 +1,78 @@
+账户的相关解释说明
+
+一、账户设计说明
+    总账户：
+        账户的总余额，代表字段是BALANCE
+
+    结算账户：
+        一笔收单交易完成之后，银行等清结算机构不是立即就会把钱结给第三方支付公司，而是过了一段时间之后才会结到支付公司备付金上，所以我们需要有地方记录
+        待结算金额 和 已结算金额，代表字段是 UNSETTLE_AMOUNT、SETTLED_AMOUNT
+
+    垫资账户：
+        1.因为在收单完成之后清结算机构不会立即把钱结给第三方支付公司，但是对商户来说，他们又有需求可以立即使用到这些资金，为了满足此需求，第三方支付
+        公司可以给商户提供垫资功能，由支付公司先垫钱让商户能够使用到资金，之后清结算机构再把钱结算给支付公司，此时，为了能把控风险，支付公司以以商户的
+        收单金额为依据来提供垫资额度，所以就需要有地方能够实时的记录商户收单金额数、已用垫资数、剩余垫资数等信息，代表字段是TOTAL_CREDIT_AMOUNT、
+        TOTAL_DEBIT_AMOUNT、TOTAL_ADVANCE_AMOUNT，为了能够更细粒度的把控住风险，可能不会100%把收单金额都垫资给商户，所以还可以设置垫资比例
+        和最大垫资金额来限制商户可以使用的垫资额度，代表字段为ADVANCE_RATIO、MAX_AVAIL_ADVANCE_AMOUNT，通过这种方式，我们就可以把控住商户的
+        可用垫资金额。
+        2.然而，在现实情况中，设置垫资比例和最大垫资金额这种做法并不是在所有业务场景都允许的，比如退款业务，假设最大垫资额度没限制，商户的垫资比例是
+        0.8，商户当天收单5笔共1000元，那么可用垫资和留存垫资就分别是800元、200元，商户已经通过代付产品把800元可用垫资给用完了，但是现在商户要对刚
+        才的其中一笔收单发起100元退款，按正常逻辑来说，这时是应该要允许可以使用那20元的留存金额进行退款的，此时，退款需求和风险把控需求就冲突了，这
+        个时候就需要看业务形态要怎么选择了，比如，方案1：另外设立退款账户，商户发起的所有退款操作，都从退款账户上面扣，这种方案就边界清晰、账单明确，
+        但是，商务操作上难度较大；方案2：退款的时候允许使用留存金额，这种方案就用款方便，但是对账可能比较复杂，同时，会打破风险控制规则，商户可结合代
+        付功能和退款功能把垫资账户的所有金额都出掉，另我们的控制手段失效，当然，这种失效并不会给我们带来资金损失，因为所有出掉的钱并不会超过总垫资金额。
+
+
+二、账户主要字段说明
+	BALANCE：					总余额，商户的账户总金额
+	SETTLED_AMOUNT：			已结算金额，已过了结算周期，商户可随时提现的金额
+	UNSETTLE_AMOUNT：			已过清分日，但未过结算周期的的金额，当过了结算周期之后，此字段上的金额会转移到SETTLED_AMOUNT上去
+	TOTAL_ADVANCE_AMOUNT：		总垫资金额，即商户剩余的垫资总额，这个字段上的金额，商户未必能全部使用
+	AVAIL_ADVANCE_AMOUNT：		可用垫资金额，在 最大垫资额度、垫资比例 两因素控制下，可用来出款的金额，任意时刻它和RETAIN_ADVANCE_AMOUNT
+	                            相加一定等于TOTAL_ADVANCE_AMOUNT
+	RETAIN_ADVANCE_AMOUNT：		留存垫资金额，在 最大垫资额度、垫资比例 两因素控制下，不能出款的金额，在任意时刻它和AVAIL_ADVANCE_AMOUNT
+	                            相加一定等于TOTAL_ADVANCE_AMOUNT
+	ADVANCE_RATIO：				垫资比例，用以控制AVAIL_ADVANCE_AMOUNT、RETAIN_ADVANCE_AMOUNT 对 TOTAL_ADVANCE_AMOUNT 的占比
+	MAX_AVAIL_ADVANCE_AMOUNT：	最大垫资金额，用以控制用户最多可使用的垫资金额
+	CURRENT_ADVANCE_AMOUNT：	当前垫资额度，等于 收单金额总额 * 垫资比例 并且不能超过 MAX_AVAIL_ADVANCE_AMOUNT 字段的值
+
+
+三、金额字段变动说明
+	BALANCE：					账户每入、出一笔，此字段值都会改变，记录账户的实时余额，同一账户内不同字段的金额流转时此字段没变化
+	SETTLED_AMOUNT：			使用已结算金额出款时，此字段扣减，清算到账时，此字段加款
+	UNSETTLE_AMOUNT：			垫资账户清零时，此字段加款，结算到账时，此字段减款，被减掉的那部分金额全部转移到SETTLED_AMOUNT字段上
+	TOTAL_ADVANCE_AMOUNT：		每收单或退回一笔垫资，此字段加款，每出款一笔垫资，此字段减款，垫资清零时，此金额全部转到UNSETTLE_AMOUNT，
+	                            然后此字段归零
+	AVAIL_ADVANCE_AMOUNT：		当TOTAL_ADVANCE_AMOUNT、ADVANCE_RATIO、MAX_AVAIL_ADVANCE_AMOUNT 任意一个字段发生变化时，此字段需重新计算
+	RETAIN_ADVANCE_AMOUNT：		当TOTAL_ADVANCE_AMOUNT、ADVANCE_RATIO、MAX_AVAIL_ADVANCE_AMOUNT 任意一个字段发生变化时，此字段需重新计算
+
+
+四、相关说明
+	4.1 字段间资金流转过程
+		step1：收单交易完成，资金入账到BALANCE和TOTAL_ADVANCE_AMOUNT
+		step2：根据垫资比例和最大垫资金额，给 AVAIL_ADVANCE_AMOUNT、RETAIN_ADVANCE_AMOUNT 分别入账
+		step3：用户可以通过代付产品，将 AVAIL_ADVANCE_AMOUNT 中的金额用来进行出款，而 RETAIN_ADVANCE_AMOUNT 中的金额一般只在收单退款场景中使用
+		step4：过了当前清算周期，将会执行垫资账户清零，剩余未使用的 AVAIL_ADVANCE_AMOUNT、RETAIN_ADVANCE_AMOUNT 金额将全部转入 UNSETTLE_AMOUNT
+		step5：过了结算周期之后UNSETTLE_AMOUNT的金额会转移到SETTLED_AMOUNT字段上
+		step5：用户可以使用代付产品把 SETTLED_AMOUNT 中的金额转出去，也可通过自动结算/手工结算把 SETTLED_AMOUNT 中的金额提现到自己的银行账户上
+
+	4.2 账务处理过程中，需关注的关系：
+		等式1： BALANCE = SETTLED_AMOUNT + UNSETTLE_AMOUNT + TOTAL_ADVANCE_AMOUNT，确保账户总余额等于 结算账户 + 垫资账户 的总和
+		等式2： TOTAL_ADVANCE_AMOUNT = BALANCE - SETTLED_AMOUNT - UNSETTLE_AMOUNT，确保垫资账户计算出来的总垫资金额与总余额减结算账户计算出来的垫资总额是相等的
+		等式3： TOTAL_ADVANCE_AMOUNT = AVAIL_ADVANCE_AMOUNT + RETAIN_ADVANCE_AMOUNT，确保总垫资余额在根据垫资比例和最大垫资金额进行分配时没有问题
+		等式4： TOTAL_ADVANCE_AMOUNT = (TOTAL_CREDIT_AMOUNT + TOTAL_RETURN_AMOUNT) - TOTAL_DEBIT_AMOUNT，确保垫资的收、支计算正确
+
+    4.3 风控金额说明：
+        此字段用以对商户疑似非合规性交易产生的金额进行控制，被控制住的那部分金额将不能够出款，由于风控可能具有延后性，所以它可以超额冻结（即冻结金额可以超过BALANCE的值），
+        超额冻结之后商户后续收单产生的金额也不能出款，直到跟风控金额持平之后才可使用。
+
+	4.4 其他说明：
+		1. 有出款退回时，若收单和退款在同一个结算日内，所有金额原路退回，垫资金额退回到总垫资金额，然后根据当前的垫资比例和最大垫资金额来分配可用垫资和留存垫资，如果是跨结算日退回，则直接退回到已结算金额
+		2. 垫资清零时，剩余的垫资金额直接全部转移到已结算金额
+		3. 属于同一结算周期内的账务明细拥有相同的清算版本号，方便对账
+		4. 垫资清零后清算版本号会加1，此版本号只增不减
+		5. 默认情况下垫资账户每日零点清零，清零完毕之后会通知清结算系统，然后清结算系统根据结算规则重新设置下次清零时间
+		6. 风控金额保证账户总余额会有一部分金额不能被使用，但不区分这部分被控制的金额是已结算金额还是可垫资亦或是留存金额，只要保证账户上有一部分金额不能出掉即可
+		7. 账户出款时将直接从账户扣款，不会有先冻结，后扣款的情况，如果业务交易失败，可进行资金退回操作
+
+

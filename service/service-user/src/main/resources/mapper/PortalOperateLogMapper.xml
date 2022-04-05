@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.xpay.service.user.entity.PortalOperateLog">
+	<sql id="table"> tbl_portal_operate_log </sql>
+
+	<!-- 用于返回的bean对象 -->
+	<resultMap id="BaseResultMap" type="com.xpay.service.user.entity.PortalOperateLog">
+		<result column="ID" property="id" jdbcType="BIGINT"/>
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="LOGIN_NAME" property="loginName" jdbcType="VARCHAR"/>
+		<result column="MCH_NO" property="mchNo" jdbcType="VARCHAR"/>
+		<result column="OPERATE_TYPE" property="operateType" jdbcType="SMALLINT"/>
+		<result column="STATUS" property="status" jdbcType="SMALLINT"/>
+		<result column="IP" property="ip" jdbcType="VARCHAR"/>
+		<result column="CONTENT" property="content" jdbcType="LONGVARCHAR"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="Base_Column_List">
+		ID,
+		CREATE_TIME,
+		LOGIN_NAME,
+		MCH_NO,
+		OPERATE_TYPE,
+		STATUS,
+		IP,
+		CONTENT
+	</sql>
+
+	<!-- 插入记录 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="PortalOperateLog">
+		INSERT INTO <include refid="table" /> (
+        	LOGIN_NAME,
+        	MCH_NO,
+        	OPERATE_TYPE,
+        	STATUS,
+        	IP,
+        	CONTENT
+        ) VALUES (
+			#{loginName,jdbcType=VARCHAR},
+			#{mchNo,jdbcType=VARCHAR},
+			#{operateType,jdbcType=SMALLINT},
+			#{status,jdbcType=SMALLINT},
+			#{ip,jdbcType=VARCHAR},
+			#{content,jdbcType=LONGVARCHAR}
+        )
+	</insert>
+
+	<!-- 批量插入记录 -->
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="id" parameterType="list">
+		INSERT INTO <include refid="table" /> (
+        	LOGIN_NAME,
+        	MCH_NO,
+        	OPERATE_TYPE,
+        	STATUS,
+        	IP,
+        	CONTENT
+        ) VALUES 
+			<foreach collection="list" item="item" separator=",">
+			(
+			#{item.loginName,jdbcType=VARCHAR},
+			#{item.mchNo,jdbcType=VARCHAR},
+			#{item.operateType,jdbcType=SMALLINT},
+			#{item.status,jdbcType=SMALLINT},
+			#{item.ip,jdbcType=VARCHAR},
+			#{item.content,jdbcType=LONGVARCHAR}
+			)
+			</foreach>
+	</insert>
+
+	<!-- 更新 -->
+	<update id="update" parameterType="PortalOperateLog">
+        UPDATE <include refid="table" />
+		<set>
+			LOGIN_NAME = #{loginName,jdbcType=VARCHAR},
+			MCH_NO = #{mchNo,jdbcType=VARCHAR},
+			OPERATE_TYPE = #{operateType,jdbcType=SMALLINT},
+			STATUS = #{status,jdbcType=SMALLINT},
+			IP = #{ip,jdbcType=VARCHAR},
+			CONTENT = #{content,jdbcType=LONGVARCHAR}
+		</set>
+        WHERE ID = #{id,jdbcType=BIGINT}
+	</update>
+
+	<!-- 只更新不为null的属性 -->
+	<update id="updateIfNotNull" parameterType="PortalOperateLog">
+		UPDATE <include refid="table" />
+		<set>
+			<if test="loginName != null">
+				LOGIN_NAME = #{loginName,jdbcType=VARCHAR},
+			</if>
+			<if test="mchNo != null">
+				MCH_NO = #{mchNo,jdbcType=VARCHAR},
+			</if>
+			<if test="operateType != null">
+				OPERATE_TYPE = #{operateType,jdbcType=SMALLINT},
+			</if>
+			<if test="status != null">
+				STATUS = #{status,jdbcType=SMALLINT},
+			</if>
+			<if test="ip != null">
+				IP = #{ip,jdbcType=VARCHAR},
+			</if>
+			<if test="content != null">
+				CONTENT = #{content,jdbcType=LONGVARCHAR}
+			</if>
+		</set>
+		WHERE ID = #{id,jdbcType=BIGINT}
+	</update>
+	
+	<!-- 多条件组合查询 -->
+	<select id="listBy" parameterType="java.util.Map" resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+		<choose>
+			<when test="sortColumns != null and sortColumns !='' ">
+				<![CDATA[ ORDER BY ${sortColumns} ]]>
+			</when>
+			<otherwise>
+				<![CDATA[ ORDER BY ID DESC ]]>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 根据多条件组合查询，计算总记录数 -->
+	<select id="countBy" parameterType="java.util.Map" resultType="long">
+		SELECT count(ID) FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+
+	<!-- 按查询条件删除 -->
+	<delete id="deleteBy">
+        DELETE FROM <include refid="table" /> 
+		<where>
+			<include refid="condition_sql" />
+		</where>
+    </delete>
+
+	<!-- 根据多个id查询 -->
+    <select id="listByIdList" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		WHERE ID IN 
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</select>
+
+	<!-- 根据id查询 -->
+    <select id="getById" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" /> 
+		WHERE ID = #{id,jdbcType=BIGINT}  
+	</select>
+
+	<!-- 按id主键删除 -->
+	<delete id="deleteById">
+        DELETE FROM <include refid="table" /> WHERE ID = #{id,jdbcType=BIGINT}
+    </delete>
+
+	<!-- 按多个id主键删除 -->
+	<delete id="deleteByIdList" parameterType="list">
+		DELETE FROM <include refid="table" />
+		WHERE ID IN 
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</delete>
+
+	<!-- ↑↑↑↑↑↑ 如果有新增字段、删除字段、修改字段 以上内容可用模板生成新内容后直接替换 ↑↑↑↑↑↑ -->
+	<!-- ↓↓↓↓↓↓ 以下内容是根据需求手动添加或修改的，请勿使用模板内容直接覆盖 ↓↓↓↓↓↓ -->
+
+	<sql id="condition_sql">
+		<if test="id != null ">
+			AND ID = #{id,jdbcType=BIGINT}
+		</if>
+		<if test="idList != null and idList.size() > 0">
+			AND ID IN <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+		</if>
+		<if test="createTime != null ">
+			AND CREATE_TIME = #{createTime,jdbcType=TIMESTAMP}
+		</if>
+		<if test="loginName != null and loginName !='' ">
+			AND LOGIN_NAME = #{loginName,jdbcType=VARCHAR}
+		</if>
+		<if test="mchNo != null and mchNo !='' ">
+			AND MCH_NO = #{mchNo,jdbcType=VARCHAR}
+		</if>
+		<if test="operateType != null ">
+			AND OPERATE_TYPE = #{operateType,jdbcType=SMALLINT}
+		</if>
+		<if test="status != null ">
+			AND STATUS = #{status,jdbcType=SMALLINT}
+		</if>
+		<if test="ip != null and ip !='' ">
+			AND IP = #{ip,jdbcType=VARCHAR}
+		</if>
+		<if test="content != null and content !='' ">
+			AND CONTENT = #{content,jdbcType=LONGVARCHAR}
+		</if>
+	</sql>
+</mapper>
+

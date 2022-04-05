@@ -1,0 +1,4 @@
+# Auto Configuration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.xpay.starter.sentinel.config.ClientAutoConfiguration,\
+com.xpay.starter.sentinel.config.DubboFallbackConfiguration

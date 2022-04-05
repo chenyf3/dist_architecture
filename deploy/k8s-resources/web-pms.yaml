@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    prometheus.io/appscrape: "true"
+    prometheus.io/path: /manageEndpoints/prometheus
+    prometheus.io/port: "8602"
+  labels:
+    app: web-pms
+    team: payment
+  name: web-pms
+  namespace: payment-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-pms
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        prometheus.io/appscrape: "true"
+        prometheus.io/path: /manageEndpoints/prometheus
+        prometheus.io/port: "8602"
+      labels:
+        app: web-pms
+        team: payment
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - web-pms
+            topologyKey: kubernetes.io/hostname
+      imagePullSecrets:
+      - name: <REG_SECRET_NAME>
+      containers:
+      - env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: APP_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels['app']
+        image: <IMAGE_NAME>
+        imagePullPolicy: IfNotPresent
+        name: app
+        readinessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 45
+          periodSeconds: 30
+          successThreshold: 1
+          tcpSocket:
+            port: 8095
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4Gi
+          requests:
+            cpu: "0.5"
+            memory: 512M
+        volumeMounts:
+        - mountPath: /home/payment/logs
+          name: log-volume
+          subPathExpr: $(POD_NAME)
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      restartPolicy: Always
+      volumes:
+      - hostPath:
+          path: /home/xpay/logs
+          type: DirectoryOrCreate
+        name: log-volume

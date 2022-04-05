@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.xpay.demo.sharding.entity.Order">
+	<sql id="table"> t_order </sql>
+
+	<!-- 用于返回的bean对象 -->
+	<resultMap id="BaseResultMap" type="com.xpay.demo.sharding.entity.Order">
+		<result column="ORDER_ID" property="orderId" jdbcType="BIGINT"/>
+		<result column="USER_ID" property="userId" jdbcType="BIGINT"/>
+		<result column="AMOUNT" property="amount" jdbcType="DECIMAL"/>
+		<result column="REMARK" property="remark" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="Base_Column_List">
+		ORDER_ID,
+		USER_ID,
+		AMOUNT,
+		REMARK
+	</sql>
+
+	<!-- 插入记录 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="orderId" parameterType="Order">
+		INSERT INTO <include refid="table" /> (
+			ORDER_ID,
+        	USER_ID,
+        	AMOUNT,
+        	REMARK
+        ) VALUES (
+			#{orderId,jdbcType=BIGINT},
+			#{userId,jdbcType=BIGINT},
+			#{amount,jdbcType=DECIMAL},
+			#{remark,jdbcType=VARCHAR}
+        )
+	</insert>
+
+	<!-- 批量插入记录 -->
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="orderId" parameterType="list">
+		INSERT INTO <include refid="table" /> (
+			ORDER_ID,
+        	USER_ID,
+        	AMOUNT,
+        	REMARK
+        ) VALUES 
+			<foreach collection="list" item="item" separator=",">
+			(
+			#{item.orderId,jdbcType=BIGINT},
+			#{item.userId,jdbcType=BIGINT},
+			#{item.amount,jdbcType=DECIMAL},
+			#{item.remark,jdbcType=VARCHAR}
+			)
+			</foreach>
+	</insert>
+
+	<!-- 更新 -->
+	<update id="update" parameterType="Order">
+        UPDATE <include refid="table" />
+		<set>
+			USER_ID = #{userId,jdbcType=BIGINT},
+			AMOUNT = #{amount,jdbcType=DECIMAL},
+			REMARK = #{remark,jdbcType=VARCHAR}
+		</set>
+        WHERE ORDER_ID = #{orderId,jdbcType=BIGINT}
+	</update>
+
+	<!-- 只更新不为null的属性 -->
+	<update id="updateIfNotNull" parameterType="Order">
+		UPDATE <include refid="table" />
+		<set>
+			<if test="userId != null">
+				USER_ID = #{userId,jdbcType=BIGINT},
+			</if>
+			<if test="amount != null">
+				AMOUNT = #{amount,jdbcType=DECIMAL},
+			</if>
+			<if test="remark != null">
+				REMARK = #{remark,jdbcType=VARCHAR}
+			</if>
+		</set>
+		WHERE ORDER_ID = #{orderId,jdbcType=BIGINT}
+	</update>
+	
+	<!-- 多条件组合查询 -->
+	<select id="listBy" parameterType="java.util.Map" resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+		<choose>
+			<when test="sortColumns != null and sortColumns !='' ">
+				<![CDATA[ ORDER BY ${sortColumns} ]]>
+			</when>
+			<otherwise>
+				<![CDATA[ ORDER BY ID DESC ]]>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 根据多条件组合查询，计算总记录数 -->
+	<select id="countBy" parameterType="java.util.Map" resultType="long">
+		SELECT count(ORDER_ID) FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+
+	<!-- 按查询条件删除 -->
+	<delete id="deleteBy">
+        DELETE FROM <include refid="table" /> 
+		<where>
+			<include refid="condition_sql" />
+		</where>
+    </delete>
+
+	<!-- 根据多个id查询 -->
+    <select id="listByIdList" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		WHERE ORDER_ID IN 
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</select>
+
+	<!-- 根据id查询 -->
+    <select id="getById" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" /> 
+		WHERE ORDER_ID = #{orderId,jdbcType=BIGINT}  
+	</select>
+
+	<!-- 按id主键删除 -->
+	<delete id="deleteById">
+        DELETE FROM <include refid="table" /> WHERE ORDER_ID = #{orderId,jdbcType=BIGINT}
+    </delete>
+
+	<!-- 按多个id主键删除 -->
+	<delete id="deleteByIdList" parameterType="list">
+		DELETE FROM <include refid="table" />
+		WHERE ORDER_ID IN 
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</delete>
+
+	<!-- ↑↑↑↑↑↑ 如果有新增字段、删除字段、修改字段 以上内容可用模板生成新内容后直接替换 ↑↑↑↑↑↑ -->
+	<!-- ↓↓↓↓↓↓ 以下内容是根据需求手动添加或修改的，请勿使用模板内容直接覆盖 ↓↓↓↓↓↓ -->
+
+	<sql id="condition_sql">
+		<if test="orderId != null ">
+			AND ORDER_ID = #{orderId,jdbcType=BIGINT}
+		</if>
+		<if test="orderIdList != null and orderIdList.size() > 0">
+			AND ORDER_ID IN <foreach collection="orderIdList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+		</if>
+		<if test="userId != null ">
+			AND USER_ID = #{userId,jdbcType=BIGINT}
+		</if>
+		<if test="amount != null ">
+			AND AMOUNT = #{amount,jdbcType=DECIMAL}
+		</if>
+		<if test="remark != null and remark !='' ">
+			AND REMARK = #{remark,jdbcType=VARCHAR}
+		</if>
+	</sql>
+</mapper>
+

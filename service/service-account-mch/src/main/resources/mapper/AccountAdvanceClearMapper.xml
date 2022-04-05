@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.xpay.service.accountmch.entity.AccountAdvanceClear">
+	<sql id="table"> tbl_account_advance_clear </sql>
+
+	<!-- 用于返回的bean对象 -->
+	<resultMap id="BaseResultMap" type="com.xpay.service.accountmch.entity.AccountAdvanceClear">
+		<result column="ID" property="id" jdbcType="BIGINT"/>
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="CREATE_DATE" property="createDate" jdbcType="DATE"/>
+		<result column="CLEAR_NO" property="clearNo" jdbcType="CHAR"/>
+		<result column="ACCOUNT_NO" property="accountNo" jdbcType="VARCHAR"/>
+		<result column="BALANCE" property="balance" jdbcType="DECIMAL"/>
+		<result column="SETTLE_AMOUNT" property="settleAmount" jdbcType="DECIMAL"/>
+		<result column="UNSETTLE_AMOUNT" property="unsettleAmount" jdbcType="DECIMAL"/>
+		<result column="TOTAL_ADVANCE_AMOUNT" property="totalAdvanceAmount" jdbcType="DECIMAL"/>
+		<result column="ADVANCE_AMOUNT" property="advanceAmount" jdbcType="DECIMAL"/>
+		<result column="RETAIN_AMOUNT" property="retainAmount" jdbcType="DECIMAL"/>
+		<result column="RSM_AMOUNT" property="rsmAmount" jdbcType="DECIMAL"/>
+		<result column="TOTAL_CREDIT_AMOUNT" property="totalCreditAmount" jdbcType="DECIMAL"/>
+		<result column="TOTAL_RETURN_AMOUNT" property="totalReturnAmount" jdbcType="DECIMAL"/>
+		<result column="TOTAL_DEBIT_AMOUNT" property="totalDebitAmount" jdbcType="DECIMAL"/>
+		<result column="REMAIN_AMOUNT" property="remainAmount" jdbcType="DECIMAL"/>
+		<result column="TOTAL_RECEIVE_COUNT" property="totalReceiveCount" jdbcType="INTEGER"/>
+		<result column="TOTAL_RETURN_COUNT" property="totalReturnCount" jdbcType="INTEGER"/>
+		<result column="TOTAL_DEBIT_COUNT" property="totalDebitCount" jdbcType="INTEGER"/>
+		<result column="ADVANCE_RATIO" property="advanceRatio" jdbcType="DECIMAL"/>
+		<result column="MAX_ADVANCE_AMOUNT" property="maxAdvanceAmount" jdbcType="DECIMAL"/>
+		<result column="CLEAR_ACCOUNT_DETAIL_ID" property="clearAccountDetailId" jdbcType="BIGINT"/>
+		<result column="CLEAR_ROUND" property="clearRound" jdbcType="TIMESTAMP"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="Base_Column_List">
+		ID,
+		CREATE_TIME,
+		CREATE_DATE,
+		CLEAR_NO,
+		ACCOUNT_NO,
+		BALANCE,
+		SETTLE_AMOUNT,
+		UNSETTLE_AMOUNT,
+		TOTAL_ADVANCE_AMOUNT,
+		ADVANCE_AMOUNT,
+		RETAIN_AMOUNT,
+		RSM_AMOUNT,
+		TOTAL_CREDIT_AMOUNT,
+		TOTAL_RETURN_AMOUNT,
+		TOTAL_DEBIT_AMOUNT,
+		REMAIN_AMOUNT,
+		TOTAL_RECEIVE_COUNT,
+		TOTAL_RETURN_COUNT,
+		TOTAL_DEBIT_COUNT,
+		ADVANCE_RATIO,
+		MAX_ADVANCE_AMOUNT,
+		CLEAR_ACCOUNT_DETAIL_ID,
+		CLEAR_ROUND
+	</sql>
+
+	<!-- 插入记录 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="AccountAdvanceClear">
+		INSERT INTO <include refid="table" /> (
+			CREATE_TIME,
+        	CREATE_DATE,
+        	CLEAR_NO,
+        	ACCOUNT_NO,
+        	BALANCE,
+        	SETTLE_AMOUNT,
+        	UNSETTLE_AMOUNT,
+        	TOTAL_ADVANCE_AMOUNT,
+        	ADVANCE_AMOUNT,
+        	RETAIN_AMOUNT,
+        	RSM_AMOUNT,
+        	TOTAL_CREDIT_AMOUNT,
+        	TOTAL_RETURN_AMOUNT,
+        	TOTAL_DEBIT_AMOUNT,
+        	REMAIN_AMOUNT,
+        	TOTAL_RECEIVE_COUNT,
+        	TOTAL_RETURN_COUNT,
+        	TOTAL_DEBIT_COUNT,
+        	ADVANCE_RATIO,
+        	MAX_ADVANCE_AMOUNT,
+        	CLEAR_ACCOUNT_DETAIL_ID,
+        	CLEAR_ROUND
+        ) VALUES (
+			#{createTime,jdbcType=TIMESTAMP},
+			#{createDate,jdbcType=DATE},
+			#{clearNo,jdbcType=CHAR},
+			#{accountNo,jdbcType=VARCHAR},
+			#{balance,jdbcType=DECIMAL},
+			#{settleAmount,jdbcType=DECIMAL},
+			#{unsettleAmount,jdbcType=DECIMAL},
+			#{totalAdvanceAmount,jdbcType=DECIMAL},
+			#{advanceAmount,jdbcType=DECIMAL},
+			#{retainAmount,jdbcType=DECIMAL},
+			#{rsmAmount,jdbcType=DECIMAL},
+			#{totalCreditAmount,jdbcType=DECIMAL},
+			#{totalReturnAmount,jdbcType=DECIMAL},
+			#{totalDebitAmount,jdbcType=DECIMAL},
+			#{remainAmount,jdbcType=DECIMAL},
+			#{totalReceiveCount,jdbcType=INTEGER},
+			#{totalReturnCount,jdbcType=INTEGER},
+			#{totalDebitCount,jdbcType=INTEGER},
+			#{advanceRatio,jdbcType=DECIMAL},
+			#{maxAdvanceAmount,jdbcType=DECIMAL},
+			#{clearAccountDetailId,jdbcType=BIGINT},
+			#{clearRound,jdbcType=TIMESTAMP}
+        )
+	</insert>
+
+	<!-- 批量插入记录 -->
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="id" parameterType="list">
+		INSERT INTO <include refid="table" /> (
+			CREATE_TIME,
+        	CREATE_DATE,
+        	CLEAR_NO,
+        	ACCOUNT_NO,
+        	BALANCE,
+        	SETTLE_AMOUNT,
+        	UNSETTLE_AMOUNT,
+        	TOTAL_ADVANCE_AMOUNT,
+        	ADVANCE_AMOUNT,
+        	RETAIN_AMOUNT,
+        	RSM_AMOUNT,
+        	TOTAL_CREDIT_AMOUNT,
+        	TOTAL_RETURN_AMOUNT,
+        	TOTAL_DEBIT_AMOUNT,
+        	REMAIN_AMOUNT,
+        	TOTAL_RECEIVE_COUNT,
+        	TOTAL_RETURN_COUNT,
+        	TOTAL_DEBIT_COUNT,
+        	ADVANCE_RATIO,
+        	MAX_ADVANCE_AMOUNT,
+        	CLEAR_ACCOUNT_DETAIL_ID,
+        	CLEAR_ROUND
+        ) VALUES 
+			<foreach collection="list" item="item" separator=",">
+			(
+			#{item.createTime,jdbcType=TIMESTAMP},
+			#{item.createDate,jdbcType=DATE},
+			#{item.clearNo,jdbcType=CHAR},
+			#{item.accountNo,jdbcType=VARCHAR},
+			#{item.balance,jdbcType=DECIMAL},
+			#{item.settleAmount,jdbcType=DECIMAL},
+			#{item.unsettleAmount,jdbcType=DECIMAL},
+			#{item.totalAdvanceAmount,jdbcType=DECIMAL},
+			#{item.advanceAmount,jdbcType=DECIMAL},
+			#{item.retainAmount,jdbcType=DECIMAL},
+			#{item.rsmAmount,jdbcType=DECIMAL},
+			#{item.totalCreditAmount,jdbcType=DECIMAL},
+			#{item.totalReturnAmount,jdbcType=DECIMAL},
+			#{item.totalDebitAmount,jdbcType=DECIMAL},
+			#{item.remainAmount,jdbcType=DECIMAL},
+			#{item.totalReceiveCount,jdbcType=INTEGER},
+			#{item.totalReturnCount,jdbcType=INTEGER},
+			#{item.totalDebitCount,jdbcType=INTEGER},
+			#{item.advanceRatio,jdbcType=DECIMAL},
+			#{item.maxAdvanceAmount,jdbcType=DECIMAL},
+			#{item.clearAccountDetailId,jdbcType=BIGINT},
+			#{item.clearRound,jdbcType=TIMESTAMP}
+			)
+			</foreach>
+	</insert>
+
+	<!-- 更新 -->
+	<update id="update" parameterType="AccountAdvanceClear">
+        UPDATE <include refid="table" />
+		<set>
+			CREATE_DATE = #{createDate,jdbcType=DATE},
+			CLEAR_NO = #{clearNo,jdbcType=CHAR},
+			ACCOUNT_NO = #{accountNo,jdbcType=VARCHAR},
+			BALANCE = #{balance,jdbcType=DECIMAL},
+			SETTLE_AMOUNT = #{settleAmount,jdbcType=DECIMAL},
+			UNSETTLE_AMOUNT = #{unsettleAmount,jdbcType=DECIMAL},
+			TOTAL_ADVANCE_AMOUNT = #{totalAdvanceAmount,jdbcType=DECIMAL},
+			ADVANCE_AMOUNT = #{advanceAmount,jdbcType=DECIMAL},
+			RETAIN_AMOUNT = #{retainAmount,jdbcType=DECIMAL},
+			RSM_AMOUNT = #{rsmAmount,jdbcType=DECIMAL},
+			TOTAL_CREDIT_AMOUNT = #{totalCreditAmount,jdbcType=DECIMAL},
+			TOTAL_RETURN_AMOUNT = #{totalReturnAmount,jdbcType=DECIMAL},
+			TOTAL_DEBIT_AMOUNT = #{totalDebitAmount,jdbcType=DECIMAL},
+			REMAIN_AMOUNT = #{remainAmount,jdbcType=DECIMAL},
+			TOTAL_RECEIVE_COUNT = #{totalReceiveCount,jdbcType=INTEGER},
+			TOTAL_RETURN_COUNT = #{totalReturnCount,jdbcType=INTEGER},
+			TOTAL_DEBIT_COUNT = #{totalDebitCount,jdbcType=INTEGER},
+			ADVANCE_RATIO = #{advanceRatio,jdbcType=DECIMAL},
+			MAX_ADVANCE_AMOUNT = #{maxAdvanceAmount,jdbcType=DECIMAL},
+			CLEAR_ACCOUNT_DETAIL_ID = #{clearAccountDetailId,jdbcType=BIGINT},
+			CLEAR_ROUND = #{clearRound,jdbcType=TIMESTAMP}
+		</set>
+        WHERE ID = #{id,jdbcType=BIGINT}
+	</update>
+
+	<!-- 只更新不为null的属性 -->
+	<update id="updateIfNotNull" parameterType="AccountAdvanceClear">
+		UPDATE <include refid="table" />
+		<set>
+			<if test="createDate != null">
+				CREATE_DATE = #{createDate,jdbcType=DATE},
+			</if>
+			<if test="clearNo != null">
+				CLEAR_NO = #{clearNo,jdbcType=CHAR},
+			</if>
+			<if test="accountNo != null">
+				ACCOUNT_NO = #{accountNo,jdbcType=VARCHAR},
+			</if>
+			<if test="balance != null">
+				BALANCE = #{balance,jdbcType=DECIMAL},
+			</if>
+			<if test="settleAmount != null">
+				SETTLE_AMOUNT = #{settleAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="unsettleAmount != null">
+				UNSETTLE_AMOUNT = #{unsettleAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="totalAdvanceAmount != null">
+				TOTAL_ADVANCE_AMOUNT = #{totalAdvanceAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="advanceAmount != null">
+				ADVANCE_AMOUNT = #{advanceAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="retainAmount != null">
+				RETAIN_AMOUNT = #{retainAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="rsmAmount != null">
+				RSM_AMOUNT = #{rsmAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="totalCreditAmount != null">
+				TOTAL_CREDIT_AMOUNT = #{totalCreditAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="totalReturnAmount != null">
+				TOTAL_RETURN_AMOUNT = #{totalReturnAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="totalDebitAmount != null">
+				TOTAL_DEBIT_AMOUNT = #{totalDebitAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="remainAmount != null">
+				REMAIN_AMOUNT = #{remainAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="totalReceiveCount != null">
+				TOTAL_RECEIVE_COUNT = #{totalReceiveCount,jdbcType=INTEGER},
+			</if>
+			<if test="totalReturnCount != null">
+				TOTAL_RETURN_COUNT = #{totalReturnCount,jdbcType=INTEGER},
+			</if>
+			<if test="totalDebitCount != null">
+				TOTAL_DEBIT_COUNT = #{totalDebitCount,jdbcType=INTEGER},
+			</if>
+			<if test="advanceRatio != null">
+				ADVANCE_RATIO = #{advanceRatio,jdbcType=DECIMAL},
+			</if>
+			<if test="maxAdvanceAmount != null">
+				MAX_ADVANCE_AMOUNT = #{maxAdvanceAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="clearAccountDetailId != null">
+				CLEAR_ACCOUNT_DETAIL_ID = #{clearAccountDetailId,jdbcType=BIGINT},
+			</if>
+			<if test="clearRound != null">
+				CLEAR_ROUND = #{clearRound,jdbcType=TIMESTAMP}
+			</if>
+		</set>
+		WHERE ID = #{id,jdbcType=BIGINT}
+	</update>
+	
+	<!-- 多条件组合查询 -->
+	<select id="listBy" parameterType="java.util.Map" resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+		<choose>
+			<when test="sortColumns != null and sortColumns !='' ">
+				<![CDATA[ ORDER BY ${sortColumns} ]]>
+			</when>
+			<otherwise>
+				<![CDATA[ ORDER BY ID DESC ]]>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 根据多条件组合查询，计算总记录数 -->
+	<select id="countBy" parameterType="java.util.Map" resultType="long">
+		SELECT count(ID) FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+
+	<!-- 按查询条件删除 -->
+	<delete id="deleteBy">
+        DELETE FROM <include refid="table" /> 
+		<where>
+			<include refid="condition_sql" />
+		</where>
+    </delete>
+
+	<!-- 根据多个id查询 -->
+    <select id="listByIdList" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		WHERE ID IN 
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</select>
+
+	<!-- 根据id查询 -->
+    <select id="getById" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" /> 
+		WHERE ID = #{id,jdbcType=BIGINT}  
+	</select>
+
+	<!-- 按id主键删除 -->
+	<delete id="deleteById">
+        DELETE FROM <include refid="table" /> WHERE ID = #{id,jdbcType=BIGINT}
+    </delete>
+
+	<!-- 按多个id主键删除 -->
+	<delete id="deleteByIdList" parameterType="list">
+		DELETE FROM <include refid="table" />
+		WHERE ID IN 
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</delete>
+
+	<!-- ↑↑↑↑↑↑ 如果有新增字段、删除字段、修改字段 以上内容可用模板生成新内容后直接替换 ↑↑↑↑↑↑ -->
+	<!-- ↓↓↓↓↓↓ 以下内容是根据需求手动添加或修改的，请勿使用模板内容直接覆盖 ↓↓↓↓↓↓ -->
+
+	<sql id="condition_sql">
+		<if test="id != null ">
+			AND ID = #{id,jdbcType=BIGINT}
+		</if>
+		<if test="idList != null and idList.size() > 0">
+			AND ID IN <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+		</if>
+		<if test="createTime != null ">
+			AND CREATE_TIME = #{createTime,jdbcType=TIMESTAMP}
+		</if>
+		<if test="createDate != null ">
+			AND CREATE_DATE = #{createDate,jdbcType=DATE}
+		</if>
+		<if test="clearNo != null and clearNo !='' ">
+			AND CLEAR_NO = #{clearNo,jdbcType=CHAR}
+		</if>
+		<if test="accountNo != null and accountNo !='' ">
+			AND ACCOUNT_NO = #{accountNo,jdbcType=VARCHAR}
+		</if>
+		<if test="clearAccountDetailId != null ">
+			AND CLEAR_ACCOUNT_DETAIL_ID = #{clearAccountDetailId,jdbcType=BIGINT}
+		</if>
+		<if test="clearRound != null ">
+			AND CLEAR_ROUND = #{clearRound,jdbcType=TIMESTAMP}
+		</if>
+	</sql>
+</mapper>
+

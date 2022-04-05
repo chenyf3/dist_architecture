@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>common-parent</artifactId>
+        <groupId>com.xpay</groupId>
+        <version>1.0-Release</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>demo-gateway-backend</artifactId>
+    <packaging>pom</packaging>
+    <description>网关的后端服务demo</description>
+
+    <modules>
+        <module>backend-webflux</module>
+        <module>backend-webmvc</module>
+        <module>backend-noSentinel</module>
+        <module>backend-callback</module>
+    </modules>
+</project>

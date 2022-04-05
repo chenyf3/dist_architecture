@@ -1,0 +1,6 @@
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.xpay.common.api.config.JacksonAutoConfiguration,\
+com.xpay.common.api.config.WebFluxCustomAutoConfiguration,\
+com.xpay.common.api.config.WebMvcCustomAutoConfiguration,\
+com.xpay.common.api.config.SentinelMvcAutoConfiguration

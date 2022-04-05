@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.xpay.service.accountmch.entity.AccountProcessDetailHistory">
+	<sql id="table"> tbl_account_process_detail_history </sql>
+
+	<!-- 用于返回的bean对象 -->
+	<resultMap id="BaseResultMap" type="com.xpay.service.accountmch.entity.AccountProcessDetailHistory">
+		<result column="ID" property="id" jdbcType="BIGINT"/>
+		<result column="VERSION" property="version" jdbcType="TINYINT"/>
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="CREATE_DATE" property="createDate" jdbcType="DATE"/>
+		<result column="ACCOUNT_NO" property="accountNo" jdbcType="VARCHAR"/>
+		<result column="BALANCE" property="balance" jdbcType="DECIMAL"/>
+		<result column="SETTLED_AMOUNT" property="settledAmount" jdbcType="DECIMAL"/>
+		<result column="UNSETTLE_AMOUNT" property="unsettleAmount" jdbcType="DECIMAL"/>
+		<result column="RSM_AMOUNT" property="rsmAmount" jdbcType="DECIMAL"/>
+		<result column="TOTAL_ADVANCE_AMOUNT" property="totalAdvanceAmount" jdbcType="DECIMAL"/>
+		<result column="AVAIL_ADVANCE_AMOUNT" property="availAdvanceAmount" jdbcType="DECIMAL"/>
+		<result column="RETAIN_ADVANCE_AMOUNT" property="retainAdvanceAmount" jdbcType="DECIMAL"/>
+		<result column="ALTER_BALANCE" property="alterBalance" jdbcType="DECIMAL"/>
+		<result column="ALTER_SETTLED_AMOUNT" property="alterSettledAmount" jdbcType="DECIMAL"/>
+		<result column="ALTER_TOTAL_ADVANCE_AMOUNT" property="alterTotalAdvanceAmount" jdbcType="DECIMAL"/>
+		<result column="ALTER_ADVANCE_AMOUNT" property="alterAdvanceAmount" jdbcType="DECIMAL"/>
+		<result column="ALTER_RETAIN_AMOUNT" property="alterRetainAmount" jdbcType="DECIMAL"/>
+		<result column="PROCESS_NO" property="processNo" jdbcType="CHAR"/>
+		<result column="REQUEST_NO" property="requestNo" jdbcType="VARCHAR"/>
+		<result column="MCH_REQUEST_NO" property="mchRequestNo" jdbcType="VARCHAR"/>
+		<result column="TRX_TIME" property="trxTime" jdbcType="TIMESTAMP"/>
+		<result column="TRX_AMOUNT" property="trxAmount" jdbcType="DECIMAL"/>
+		<result column="FEE" property="fee" jdbcType="DECIMAL"/>
+		<result column="REMARK" property="remark" jdbcType="VARCHAR"/>
+		<result column="PROCESS_TYPE" property="processType" jdbcType="TINYINT"/>
+		<result column="EXTRA_INFO" property="extraInfo" jdbcType="OTHER"/>
+		<result column="LIQUIDATION" property="liquidation" jdbcType="TINYINT"/>
+		<result column="LIQUIDATE_VERSION" property="liquidateVersion" jdbcType="INTEGER"/>
+		<result column="MIGRATE_TIME" property="migrateTime" jdbcType="TIMESTAMP"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="Base_Column_List">
+		ID,
+		VERSION,
+		CREATE_TIME,
+		CREATE_DATE,
+		ACCOUNT_NO,
+		BALANCE,
+		SETTLED_AMOUNT,
+		UNSETTLE_AMOUNT,
+		RSM_AMOUNT,
+		TOTAL_ADVANCE_AMOUNT,
+		AVAIL_ADVANCE_AMOUNT,
+		RETAIN_ADVANCE_AMOUNT,
+		ALTER_BALANCE,
+		ALTER_SETTLED_AMOUNT,
+		ALTER_TOTAL_ADVANCE_AMOUNT,
+		ALTER_ADVANCE_AMOUNT,
+		ALTER_RETAIN_AMOUNT,
+		PROCESS_NO,
+		REQUEST_NO,
+		MCH_REQUEST_NO,
+		TRX_TIME,
+		TRX_AMOUNT,
+		FEE,
+		REMARK,
+		PROCESS_TYPE,
+		EXTRA_INFO,
+		LIQUIDATION,
+		LIQUIDATE_VERSION,
+		MIGRATE_TIME
+	</sql>
+
+	<!-- 插入记录 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="AccountProcessDetailHistory">
+		INSERT INTO <include refid="table" /> (
+        	VERSION,
+			CREATE_TIME,
+        	CREATE_DATE,
+        	ACCOUNT_NO,
+        	BALANCE,
+        	SETTLED_AMOUNT,
+        	UNSETTLE_AMOUNT,
+        	RSM_AMOUNT,
+        	TOTAL_ADVANCE_AMOUNT,
+        	AVAIL_ADVANCE_AMOUNT,
+        	RETAIN_ADVANCE_AMOUNT,
+        	ALTER_BALANCE,
+        	ALTER_SETTLED_AMOUNT,
+        	ALTER_TOTAL_ADVANCE_AMOUNT,
+        	ALTER_ADVANCE_AMOUNT,
+        	ALTER_RETAIN_AMOUNT,
+        	PROCESS_NO,
+        	REQUEST_NO,
+        	MCH_REQUEST_NO,
+        	TRX_TIME,
+        	TRX_AMOUNT,
+        	FEE,
+        	REMARK,
+        	PROCESS_TYPE,
+        	EXTRA_INFO,
+        	LIQUIDATION,
+        	LIQUIDATE_VERSION,
+        	MIGRATE_TIME
+        ) VALUES (
+			0,
+			#{createTime,jdbcType=TIMESTAMP},
+			#{createDate,jdbcType=DATE},
+			#{accountNo,jdbcType=VARCHAR},
+			#{balance,jdbcType=DECIMAL},
+			#{settledAmount,jdbcType=DECIMAL},
+			#{unsettleAmount,jdbcType=DECIMAL},
+			#{rsmAmount,jdbcType=DECIMAL},
+			#{totalAdvanceAmount,jdbcType=DECIMAL},
+			#{availAdvanceAmount,jdbcType=DECIMAL},
+			#{retainAdvanceAmount,jdbcType=DECIMAL},
+			#{alterBalance,jdbcType=DECIMAL},
+			#{alterSettledAmount,jdbcType=DECIMAL},
+			#{alterTotalAdvanceAmount,jdbcType=DECIMAL},
+			#{alterAdvanceAmount,jdbcType=DECIMAL},
+			#{alterRetainAmount,jdbcType=DECIMAL},
+			#{processNo,jdbcType=CHAR},
+			#{requestNo,jdbcType=VARCHAR},
+			#{mchRequestNo,jdbcType=VARCHAR},
+			#{trxTime,jdbcType=TIMESTAMP},
+			#{trxAmount,jdbcType=DECIMAL},
+			#{fee,jdbcType=DECIMAL},
+			#{remark,jdbcType=VARCHAR},
+			#{processType,jdbcType=TINYINT},
+			#{extraInfo,jdbcType=OTHER},
+			#{liquidation,jdbcType=TINYINT},
+			#{liquidateVersion,jdbcType=INTEGER},
+			#{migrateTime,jdbcType=TIMESTAMP}
+        )
+	</insert>
+
+	<!-- 批量插入记录 -->
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="id" parameterType="list">
+		INSERT INTO <include refid="table" /> (
+        	VERSION,
+			CREATE_TIME,
+        	CREATE_DATE,
+        	ACCOUNT_NO,
+        	BALANCE,
+        	SETTLED_AMOUNT,
+        	UNSETTLE_AMOUNT,
+        	RSM_AMOUNT,
+        	TOTAL_ADVANCE_AMOUNT,
+        	AVAIL_ADVANCE_AMOUNT,
+        	RETAIN_ADVANCE_AMOUNT,
+        	ALTER_BALANCE,
+        	ALTER_SETTLED_AMOUNT,
+        	ALTER_TOTAL_ADVANCE_AMOUNT,
+        	ALTER_ADVANCE_AMOUNT,
+        	ALTER_RETAIN_AMOUNT,
+        	PROCESS_NO,
+        	REQUEST_NO,
+        	MCH_REQUEST_NO,
+        	TRX_TIME,
+        	TRX_AMOUNT,
+        	FEE,
+        	REMARK,
+        	PROCESS_TYPE,
+        	EXTRA_INFO,
+        	LIQUIDATION,
+        	LIQUIDATE_VERSION,
+        	MIGRATE_TIME
+        ) VALUES 
+			<foreach collection="list" item="item" separator=",">
+			(
+			0,
+			#{item.createTime,jdbcType=TIMESTAMP},
+			#{item.createDate,jdbcType=DATE},
+			#{item.accountNo,jdbcType=VARCHAR},
+			#{item.balance,jdbcType=DECIMAL},
+			#{item.settledAmount,jdbcType=DECIMAL},
+			#{item.unsettleAmount,jdbcType=DECIMAL},
+			#{item.rsmAmount,jdbcType=DECIMAL},
+			#{item.totalAdvanceAmount,jdbcType=DECIMAL},
+			#{item.availAdvanceAmount,jdbcType=DECIMAL},
+			#{item.retainAdvanceAmount,jdbcType=DECIMAL},
+			#{item.alterBalance,jdbcType=DECIMAL},
+			#{item.alterSettledAmount,jdbcType=DECIMAL},
+			#{item.alterTotalAdvanceAmount,jdbcType=DECIMAL},
+			#{item.alterAdvanceAmount,jdbcType=DECIMAL},
+			#{item.alterRetainAmount,jdbcType=DECIMAL},
+			#{item.processNo,jdbcType=CHAR},
+			#{item.requestNo,jdbcType=VARCHAR},
+			#{item.mchRequestNo,jdbcType=VARCHAR},
+			#{item.trxTime,jdbcType=TIMESTAMP},
+			#{item.trxAmount,jdbcType=DECIMAL},
+			#{item.fee,jdbcType=DECIMAL},
+			#{item.remark,jdbcType=VARCHAR},
+			#{item.processType,jdbcType=TINYINT},
+			#{item.extraInfo,jdbcType=OTHER},
+			#{item.liquidation,jdbcType=TINYINT},
+			#{item.liquidateVersion,jdbcType=INTEGER},
+			#{item.migrateTime,jdbcType=TIMESTAMP}
+			)
+			</foreach>
+	</insert>
+
+	<!-- 更新 -->
+	<update id="update" parameterType="AccountProcessDetailHistory">
+        UPDATE <include refid="table" />
+		<set>
+			VERSION = #{version,jdbcType=TINYINT} + 1,
+			CREATE_DATE = #{createDate,jdbcType=DATE},
+			ACCOUNT_NO = #{accountNo,jdbcType=VARCHAR},
+			BALANCE = #{balance,jdbcType=DECIMAL},
+			SETTLED_AMOUNT = #{settledAmount,jdbcType=DECIMAL},
+			UNSETTLE_AMOUNT = #{unsettleAmount,jdbcType=DECIMAL},
+			RSM_AMOUNT = #{rsmAmount,jdbcType=DECIMAL},
+			TOTAL_ADVANCE_AMOUNT = #{totalAdvanceAmount,jdbcType=DECIMAL},
+			AVAIL_ADVANCE_AMOUNT = #{availAdvanceAmount,jdbcType=DECIMAL},
+			RETAIN_ADVANCE_AMOUNT = #{retainAdvanceAmount,jdbcType=DECIMAL},
+			ALTER_BALANCE = #{alterBalance,jdbcType=DECIMAL},
+			ALTER_SETTLED_AMOUNT = #{alterSettledAmount,jdbcType=DECIMAL},
+			ALTER_TOTAL_ADVANCE_AMOUNT = #{alterTotalAdvanceAmount,jdbcType=DECIMAL},
+			ALTER_ADVANCE_AMOUNT = #{alterAdvanceAmount,jdbcType=DECIMAL},
+			ALTER_RETAIN_AMOUNT = #{alterRetainAmount,jdbcType=DECIMAL},
+			PROCESS_NO = #{processNo,jdbcType=CHAR},
+			REQUEST_NO = #{requestNo,jdbcType=VARCHAR},
+			MCH_REQUEST_NO = #{mchRequestNo,jdbcType=VARCHAR},
+			TRX_TIME = #{trxTime,jdbcType=TIMESTAMP},
+			TRX_AMOUNT = #{trxAmount,jdbcType=DECIMAL},
+			FEE = #{fee,jdbcType=DECIMAL},
+			REMARK = #{remark,jdbcType=VARCHAR},
+			PROCESS_TYPE = #{processType,jdbcType=TINYINT},
+			EXTRA_INFO = #{extraInfo,jdbcType=OTHER},
+			LIQUIDATION = #{liquidation,jdbcType=TINYINT},
+			LIQUIDATE_VERSION = #{liquidateVersion,jdbcType=INTEGER},
+			MIGRATE_TIME = #{migrateTime,jdbcType=TIMESTAMP}
+		</set>
+        WHERE ID = #{id,jdbcType=BIGINT} and VERSION = #{version,jdbcType=TINYINT}
+	</update>
+
+	<!-- 只更新不为null的属性 -->
+	<update id="updateIfNotNull" parameterType="AccountProcessDetailHistory">
+		UPDATE <include refid="table" />
+		<set>
+			VERSION = #{version,jdbcType=TINYINT} + 1,
+			<if test="createDate != null">
+				CREATE_DATE = #{createDate,jdbcType=DATE},
+			</if>
+			<if test="accountNo != null">
+				ACCOUNT_NO = #{accountNo,jdbcType=VARCHAR},
+			</if>
+			<if test="balance != null">
+				BALANCE = #{balance,jdbcType=DECIMAL},
+			</if>
+			<if test="settledAmount != null">
+				SETTLED_AMOUNT = #{settledAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="unsettleAmount != null">
+				UNSETTLE_AMOUNT = #{unsettleAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="rsmAmount != null">
+				RSM_AMOUNT = #{rsmAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="totalAdvanceAmount != null">
+				TOTAL_ADVANCE_AMOUNT = #{totalAdvanceAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="availAdvanceAmount != null">
+				AVAIL_ADVANCE_AMOUNT = #{availAdvanceAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="retainAdvanceAmount != null">
+				RETAIN_ADVANCE_AMOUNT = #{retainAdvanceAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="alterBalance != null">
+				ALTER_BALANCE = #{alterBalance,jdbcType=DECIMAL},
+			</if>
+			<if test="alterSettledAmount != null">
+				ALTER_SETTLED_AMOUNT = #{alterSettledAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="alterTotalAdvanceAmount != null">
+				ALTER_TOTAL_ADVANCE_AMOUNT = #{alterTotalAdvanceAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="alterAdvanceAmount != null">
+				ALTER_ADVANCE_AMOUNT = #{alterAdvanceAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="alterRetainAmount != null">
+				ALTER_RETAIN_AMOUNT = #{alterRetainAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="processNo != null">
+				PROCESS_NO = #{processNo,jdbcType=CHAR},
+			</if>
+			<if test="requestNo != null">
+				REQUEST_NO = #{requestNo,jdbcType=VARCHAR},
+			</if>
+			<if test="mchRequestNo != null">
+				MCH_REQUEST_NO = #{mchRequestNo,jdbcType=VARCHAR},
+			</if>
+			<if test="trxTime != null">
+				TRX_TIME = #{trxTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="trxAmount != null">
+				TRX_AMOUNT = #{trxAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="fee != null">
+				FEE = #{fee,jdbcType=DECIMAL},
+			</if>
+			<if test="remark != null">
+				REMARK = #{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="processType != null">
+				PROCESS_TYPE = #{processType,jdbcType=TINYINT},
+			</if>
+			<if test="extraInfo != null">
+				EXTRA_INFO = #{extraInfo,jdbcType=OTHER},
+			</if>
+			<if test="liquidation != null">
+				LIQUIDATION = #{liquidation,jdbcType=TINYINT},
+			</if>
+			<if test="liquidateVersion != null">
+				LIQUIDATE_VERSION = #{liquidateVersion,jdbcType=INTEGER},
+			</if>
+			<if test="migrateTime != null">
+				MIGRATE_TIME = #{migrateTime,jdbcType=TIMESTAMP}
+			</if>
+		</set>
+		WHERE ID = #{id,jdbcType=BIGINT} and VERSION = #{version,jdbcType=TINYINT}
+	</update>
+	
+	<!-- 多条件组合查询 -->
+	<select id="listBy" parameterType="java.util.Map" resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+		<choose>
+			<when test="sortColumns != null and sortColumns !='' ">
+				<![CDATA[ ORDER BY ${sortColumns} ]]>
+			</when>
+			<otherwise>
+				<![CDATA[ ORDER BY ID DESC ]]>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 根据多条件组合查询，计算总记录数 -->
+	<select id="countBy" parameterType="java.util.Map" resultType="long">
+		SELECT count(ID) FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+
+	<!-- 按查询条件删除 -->
+	<delete id="deleteBy">
+        DELETE FROM <include refid="table" /> 
+		<where>
+			<include refid="condition_sql" />
+		</where>
+    </delete>
+
+	<!-- 根据多个id查询 -->
+    <select id="listByIdList" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		WHERE ID IN 
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</select>
+
+	<!-- 根据id查询 -->
+    <select id="getById" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" /> 
+		WHERE ID = #{id,jdbcType=BIGINT}  
+	</select>
+
+	<!-- 按id主键删除 -->
+	<delete id="deleteById">
+        DELETE FROM <include refid="table" /> WHERE ID = #{id,jdbcType=BIGINT}
+    </delete>
+
+	<!-- 按多个id主键删除 -->
+	<delete id="deleteByIdList" parameterType="list">
+		DELETE FROM <include refid="table" />
+		WHERE ID IN 
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</delete>
+
+	<!-- ↑↑↑↑↑↑ 如果有新增字段、删除字段、修改字段 以上内容可用模板生成新内容后直接替换 ↑↑↑↑↑↑ -->
+	<!-- ↓↓↓↓↓↓ 以下内容是根据需求手动添加或修改的，请勿使用模板内容直接覆盖 ↓↓↓↓↓↓ -->
+
+	<sql id="condition_sql">
+		<if test="id != null ">
+			AND ID = #{id,jdbcType=BIGINT}
+		</if>
+		<if test="idList != null and idList.size() > 0">
+			AND ID IN <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+		</if>
+		<if test="createTimeBegin != null and createTimeEnd != '' ">
+			AND CREATE_TIME between #{createTimeBegin,jdbcType=TIMESTAMP} and #{createTimeEnd,jdbcType=TIMESTAMP}
+		</if>
+		<if test="createDate != null ">
+			AND CREATE_DATE = #{createDate,jdbcType=DATE}
+		</if>
+		<if test="accountNo != null and accountNo !='' ">
+			AND ACCOUNT_NO = #{accountNo,jdbcType=VARCHAR}
+		</if>
+		<if test="requestNo != null and requestNo !='' ">
+			AND REQUEST_NO = #{requestNo,jdbcType=VARCHAR}
+		</if>
+		<if test="processNo != null and processNo !='' ">
+			AND PROCESS_NO = #{processNo,jdbcType=CHAR}
+		</if>
+		<if test="mchRequestNo != null and mchRequestNo !='' ">
+			AND MCH_REQUEST_NO = #{mchRequestNo,jdbcType=VARCHAR}
+		</if>
+		<if test="processType != null ">
+			AND PROCESS_TYPE = #{processType,jdbcType=TINYINT}
+		</if>
+		<if test="liquidation != null ">
+			AND LIQUIDATION = #{liquidation,jdbcType=TINYINT}
+		</if>
+		<if test="liquidateVersion != null ">
+			AND LIQUIDATE_VERSION = #{liquidateVersion,jdbcType=INTEGER}
+		</if>
+	</sql>
+
+	<select id="listDetailDtoByAccountNoAndRequestNo" parameterType="map" resultType="com.xpay.common.statics.dto.account.AccountDetailDto">
+		SELECT ACCOUNT_NO AS 'accountNo',
+		REQUEST_NO AS 'requestNo',
+		PROCESS_TYPE AS 'processType',
+		TRX_AMOUNT AS 'alterAmount',
+		ALTER_SETTLED_AMOUNT AS 'alterSettleAmount',
+		ALTER_ADVANCE_AMOUNT AS 'alterAdvanceAmount',
+		ALTER_RETAIN_AMOUNT AS 'alterRetainAmount',
+		LIQUIDATE_VERSION AS 'liquidateVersion'
+		FROM <include refid="table" />
+		WHERE ACCOUNT_NO = #{accountNo,jdbcType=VARCHAR} AND REQUEST_NO = #{requestNo,jdbcType=VARCHAR} AND CREATE_TIME >= #{createTimeBegin,jdbcType=TIMESTAMP}
+	</select>
+</mapper>
+

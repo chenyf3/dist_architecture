@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.xpay.service.accountmch.entity.AccountMch">
+	<sql id="table"> tbl_account_mch </sql>
+
+	<!-- 用于返回的bean对象 -->
+	<resultMap id="BaseResultMap" type="com.xpay.service.accountmch.entity.AccountMch">
+		<result column="ID" property="id" jdbcType="BIGINT"/>
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="VERSION" property="version" jdbcType="BIGINT"/>
+		<result column="ACCOUNT_NO" property="accountNo" jdbcType="VARCHAR"/>
+		<result column="STATUS" property="status" jdbcType="TINYINT"/>
+		<result column="BALANCE" property="balance" jdbcType="DECIMAL"/>
+		<result column="SETTLED_AMOUNT" property="settledAmount" jdbcType="DECIMAL"/>
+		<result column="UNSETTLE_AMOUNT" property="unsettleAmount" jdbcType="DECIMAL"/>
+		<result column="RSM_AMOUNT" property="rsmAmount" jdbcType="DECIMAL"/>
+		<result column="TOTAL_ADVANCE_AMOUNT" property="totalAdvanceAmount" jdbcType="DECIMAL"/>
+		<result column="AVAIL_ADVANCE_AMOUNT" property="availAdvanceAmount" jdbcType="DECIMAL"/>
+		<result column="RETAIN_ADVANCE_AMOUNT" property="retainAdvanceAmount" jdbcType="DECIMAL"/>
+		<result column="CURRENT_ADVANCE_AMOUNT" property="currentAdvanceAmount" jdbcType="DECIMAL"/>
+		<result column="TOTAL_CREDIT_AMOUNT" property="totalCreditAmount" jdbcType="DECIMAL"/>
+		<result column="TOTAL_DEBIT_AMOUNT" property="totalDebitAmount" jdbcType="DECIMAL"/>
+		<result column="TOTAL_RETURN_AMOUNT" property="totalReturnAmount" jdbcType="DECIMAL"/>
+		<result column="TOTAL_ADVANCE_DEBIT_AMOUNT" property="totalAdvanceDebitAmount" jdbcType="DECIMAL"/>
+		<result column="TOTAL_ADVANCE_RETURN_AMOUNT" property="totalAdvanceReturnAmount" jdbcType="DECIMAL"/>
+		<result column="TOTAL_ORDER_COUNT" property="totalOrderCount" jdbcType="VARCHAR"/>
+		<result column="TOTAL_CROSS_RETURN_AMOUNT" property="totalCrossReturnAmount" jdbcType="DECIMAL"/>
+		<result column="ADVANCE_RATIO" property="advanceRatio" jdbcType="DECIMAL"/>
+		<result column="MAX_AVAIL_ADVANCE_AMOUNT" property="maxAvailAdvanceAmount" jdbcType="DECIMAL"/>
+		<result column="NEXT_SNAP_TIME" property="nextSnapTime" jdbcType="INTEGER"/>
+		<result column="NEXT_LIQUIDATE_TIME" property="nextLiquidateTime" jdbcType="INTEGER"/>
+		<result column="LIQUIDATE_VERSION" property="liquidateVersion" jdbcType="INTEGER"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="Base_Column_List">
+		ID,
+		CREATE_TIME,
+		VERSION,
+		ACCOUNT_NO,
+		STATUS,
+		BALANCE,
+		SETTLED_AMOUNT,
+		UNSETTLE_AMOUNT,
+		RSM_AMOUNT,
+		TOTAL_ADVANCE_AMOUNT,
+		AVAIL_ADVANCE_AMOUNT,
+		RETAIN_ADVANCE_AMOUNT,
+		CURRENT_ADVANCE_AMOUNT,
+		TOTAL_CREDIT_AMOUNT,
+		TOTAL_DEBIT_AMOUNT,
+		TOTAL_RETURN_AMOUNT,
+		TOTAL_ADVANCE_DEBIT_AMOUNT,
+		TOTAL_ADVANCE_RETURN_AMOUNT,
+		TOTAL_ORDER_COUNT,
+		TOTAL_CROSS_RETURN_AMOUNT,
+		ADVANCE_RATIO,
+		MAX_AVAIL_ADVANCE_AMOUNT,
+		NEXT_SNAP_TIME,
+		NEXT_LIQUIDATE_TIME,
+		LIQUIDATE_VERSION
+	</sql>
+
+	<!-- 插入记录 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="AccountMch">
+		INSERT INTO <include refid="table" /> (
+        	CREATE_TIME,
+        	VERSION,
+        	ACCOUNT_NO,
+        	STATUS,
+        	BALANCE,
+        	SETTLED_AMOUNT,
+        	UNSETTLE_AMOUNT,
+        	RSM_AMOUNT,
+        	TOTAL_ADVANCE_AMOUNT,
+        	AVAIL_ADVANCE_AMOUNT,
+        	RETAIN_ADVANCE_AMOUNT,
+        	CURRENT_ADVANCE_AMOUNT,
+        	TOTAL_CREDIT_AMOUNT,
+        	TOTAL_DEBIT_AMOUNT,
+        	TOTAL_RETURN_AMOUNT,
+        	TOTAL_ADVANCE_DEBIT_AMOUNT,
+        	TOTAL_ADVANCE_RETURN_AMOUNT,
+        	TOTAL_ORDER_COUNT,
+        	TOTAL_CROSS_RETURN_AMOUNT,
+        	ADVANCE_RATIO,
+        	MAX_AVAIL_ADVANCE_AMOUNT,
+        	NEXT_SNAP_TIME,
+        	NEXT_LIQUIDATE_TIME,
+        	LIQUIDATE_VERSION
+        ) VALUES (
+			#{createTime,jdbcType=TIMESTAMP},
+			0,
+			#{accountNo,jdbcType=VARCHAR},
+			#{status,jdbcType=TINYINT},
+			#{balance,jdbcType=DECIMAL},
+			#{settledAmount,jdbcType=DECIMAL},
+			#{unsettleAmount,jdbcType=DECIMAL},
+			#{rsmAmount,jdbcType=DECIMAL},
+			#{totalAdvanceAmount,jdbcType=DECIMAL},
+			#{availAdvanceAmount,jdbcType=DECIMAL},
+			#{retainAdvanceAmount,jdbcType=DECIMAL},
+			#{currentAdvanceAmount,jdbcType=DECIMAL},
+			#{totalCreditAmount,jdbcType=DECIMAL},
+			#{totalDebitAmount,jdbcType=DECIMAL},
+			#{totalReturnAmount,jdbcType=DECIMAL},
+			#{totalAdvanceDebitAmount,jdbcType=DECIMAL},
+			#{totalAdvanceReturnAmount,jdbcType=DECIMAL},
+			#{totalOrderCount,jdbcType=VARCHAR},
+			#{totalCrossReturnAmount,jdbcType=DECIMAL},
+			#{advanceRatio,jdbcType=DECIMAL},
+			#{maxAvailAdvanceAmount,jdbcType=DECIMAL},
+			#{nextSnapTime,jdbcType=INTEGER},
+			#{nextLiquidateTime,jdbcType=INTEGER},
+			#{liquidateVersion,jdbcType=INTEGER}
+        )
+	</insert>
+
+	<!-- 批量插入记录 -->
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="id" parameterType="list">
+		INSERT INTO <include refid="table" /> (
+        	CREATE_TIME,
+        	VERSION,
+        	ACCOUNT_NO,
+        	STATUS,
+        	BALANCE,
+        	SETTLED_AMOUNT,
+        	UNSETTLE_AMOUNT,
+        	RSM_AMOUNT,
+        	TOTAL_ADVANCE_AMOUNT,
+        	AVAIL_ADVANCE_AMOUNT,
+        	RETAIN_ADVANCE_AMOUNT,
+        	CURRENT_ADVANCE_AMOUNT,
+        	TOTAL_CREDIT_AMOUNT,
+        	TOTAL_DEBIT_AMOUNT,
+        	TOTAL_RETURN_AMOUNT,
+        	TOTAL_ADVANCE_DEBIT_AMOUNT,
+        	TOTAL_ADVANCE_RETURN_AMOUNT,
+        	TOTAL_ORDER_COUNT,
+        	TOTAL_CROSS_RETURN_AMOUNT,
+        	ADVANCE_RATIO,
+        	MAX_AVAIL_ADVANCE_AMOUNT,
+        	NEXT_SNAP_TIME,
+        	NEXT_LIQUIDATE_TIME,
+        	LIQUIDATE_VERSION
+        ) VALUES 
+			<foreach collection="list" item="item" separator=",">
+			(
+			#{item.createTime,jdbcType=TIMESTAMP},
+			0,
+			#{item.accountNo,jdbcType=VARCHAR},
+			#{item.status,jdbcType=TINYINT},
+			#{item.balance,jdbcType=DECIMAL},
+			#{item.settledAmount,jdbcType=DECIMAL},
+			#{item.unsettleAmount,jdbcType=DECIMAL},
+			#{item.rsmAmount,jdbcType=DECIMAL},
+			#{item.totalAdvanceAmount,jdbcType=DECIMAL},
+			#{item.availAdvanceAmount,jdbcType=DECIMAL},
+			#{item.retainAdvanceAmount,jdbcType=DECIMAL},
+			#{item.currentAdvanceAmount,jdbcType=DECIMAL},
+			#{item.totalCreditAmount,jdbcType=DECIMAL},
+			#{item.totalDebitAmount,jdbcType=DECIMAL},
+			#{item.totalReturnAmount,jdbcType=DECIMAL},
+			#{item.totalAdvanceDebitAmount,jdbcType=DECIMAL},
+			#{item.totalAdvanceReturnAmount,jdbcType=DECIMAL},
+			#{item.totalOrderCount,jdbcType=VARCHAR},
+			#{item.totalCrossReturnAmount,jdbcType=DECIMAL},
+			#{item.advanceRatio,jdbcType=DECIMAL},
+			#{item.maxAvailAdvanceAmount,jdbcType=DECIMAL},
+			#{item.nextSnapTime,jdbcType=INTEGER},
+			#{item.nextLiquidateTime,jdbcType=INTEGER},
+			#{item.liquidateVersion,jdbcType=INTEGER}
+			)
+			</foreach>
+	</insert>
+
+	<!-- 更新 -->
+	<update id="update" parameterType="AccountMch">
+        UPDATE <include refid="table" />
+		<set>
+			CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+			VERSION = #{version,jdbcType=BIGINT} + 1,
+			ACCOUNT_NO = #{accountNo,jdbcType=VARCHAR},
+			STATUS = #{status,jdbcType=TINYINT},
+			BALANCE = #{balance,jdbcType=DECIMAL},
+			SETTLED_AMOUNT = #{settledAmount,jdbcType=DECIMAL},
+			UNSETTLE_AMOUNT = #{unsettleAmount,jdbcType=DECIMAL},
+			RSM_AMOUNT = #{rsmAmount,jdbcType=DECIMAL},
+			TOTAL_ADVANCE_AMOUNT = #{totalAdvanceAmount,jdbcType=DECIMAL},
+			AVAIL_ADVANCE_AMOUNT = #{availAdvanceAmount,jdbcType=DECIMAL},
+			RETAIN_ADVANCE_AMOUNT = #{retainAdvanceAmount,jdbcType=DECIMAL},
+			CURRENT_ADVANCE_AMOUNT = #{currentAdvanceAmount,jdbcType=DECIMAL},
+			TOTAL_CREDIT_AMOUNT = #{totalCreditAmount,jdbcType=DECIMAL},
+			TOTAL_DEBIT_AMOUNT = #{totalDebitAmount,jdbcType=DECIMAL},
+			TOTAL_RETURN_AMOUNT = #{totalReturnAmount,jdbcType=DECIMAL},
+			TOTAL_ADVANCE_DEBIT_AMOUNT = #{totalAdvanceDebitAmount,jdbcType=DECIMAL},
+			TOTAL_ADVANCE_RETURN_AMOUNT = #{totalAdvanceReturnAmount,jdbcType=DECIMAL},
+			TOTAL_ORDER_COUNT = #{totalOrderCount,jdbcType=VARCHAR},
+			TOTAL_CROSS_RETURN_AMOUNT = #{totalCrossReturnAmount,jdbcType=DECIMAL},
+			ADVANCE_RATIO = #{advanceRatio,jdbcType=DECIMAL},
+			MAX_AVAIL_ADVANCE_AMOUNT = #{maxAvailAdvanceAmount,jdbcType=DECIMAL},
+			NEXT_SNAP_TIME = #{nextSnapTime,jdbcType=INTEGER},
+			NEXT_LIQUIDATE_TIME = #{nextLiquidateTime,jdbcType=INTEGER},
+			LIQUIDATE_VERSION = #{liquidateVersion,jdbcType=INTEGER}
+		</set>
+        WHERE ID = #{id,jdbcType=BIGINT} and VERSION = #{version,jdbcType=BIGINT}
+	</update>
+
+	<!-- 只更新不为null的属性 -->
+	<update id="updateIfNotNull" parameterType="AccountMch">
+		UPDATE <include refid="table" />
+		<set>
+			<if test="createTime != null">
+				CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			VERSION = #{version,jdbcType=BIGINT} + 1,
+			<if test="accountNo != null">
+				ACCOUNT_NO = #{accountNo,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null">
+				STATUS = #{status,jdbcType=TINYINT},
+			</if>
+			<if test="balance != null">
+				BALANCE = #{balance,jdbcType=DECIMAL},
+			</if>
+			<if test="settledAmount != null">
+				SETTLED_AMOUNT = #{settledAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="unsettleAmount != null">
+				UNSETTLE_AMOUNT = #{unsettleAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="rsmAmount != null">
+				RSM_AMOUNT = #{rsmAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="totalAdvanceAmount != null">
+				TOTAL_ADVANCE_AMOUNT = #{totalAdvanceAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="availAdvanceAmount != null">
+				AVAIL_ADVANCE_AMOUNT = #{availAdvanceAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="retainAdvanceAmount != null">
+				RETAIN_ADVANCE_AMOUNT = #{retainAdvanceAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="currentAdvanceAmount != null">
+				CURRENT_ADVANCE_AMOUNT = #{currentAdvanceAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="totalCreditAmount != null">
+				TOTAL_CREDIT_AMOUNT = #{totalCreditAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="totalDebitAmount != null">
+				TOTAL_DEBIT_AMOUNT = #{totalDebitAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="totalReturnAmount != null">
+				TOTAL_RETURN_AMOUNT = #{totalReturnAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="totalAdvanceDebitAmount != null">
+				TOTAL_ADVANCE_DEBIT_AMOUNT = #{totalAdvanceDebitAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="totalAdvanceReturnAmount != null">
+				TOTAL_ADVANCE_RETURN_AMOUNT = #{totalAdvanceReturnAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="totalOrderCount != null">
+				TOTAL_ORDER_COUNT = #{totalOrderCount,jdbcType=VARCHAR},
+			</if>
+			<if test="totalCrossReturnAmount != null">
+				TOTAL_CROSS_RETURN_AMOUNT = #{totalCrossReturnAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="advanceRatio != null">
+				ADVANCE_RATIO = #{advanceRatio,jdbcType=DECIMAL},
+			</if>
+			<if test="maxAvailAdvanceAmount != null">
+				MAX_AVAIL_ADVANCE_AMOUNT = #{maxAvailAdvanceAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="nextSnapTime != null">
+				NEXT_SNAP_TIME = #{nextSnapTime,jdbcType=INTEGER},
+			</if>
+			<if test="nextLiquidateTime != null">
+				NEXT_LIQUIDATE_TIME = #{nextLiquidateTime,jdbcType=INTEGER},
+			</if>
+			<if test="liquidateVersion != null">
+				LIQUIDATE_VERSION = #{liquidateVersion,jdbcType=INTEGER}
+			</if>
+		</set>
+		WHERE ID = #{id,jdbcType=BIGINT} and VERSION = #{version,jdbcType=BIGINT}
+	</update>
+	
+	<!-- 多条件组合查询 -->
+	<select id="listBy" parameterType="java.util.Map" resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+		<choose>
+			<when test="sortColumns != null and sortColumns !='' ">
+				<![CDATA[ ORDER BY ${sortColumns} ]]>
+			</when>
+			<otherwise>
+				<![CDATA[ ORDER BY ID DESC ]]>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 根据多条件组合查询，计算总记录数 -->
+	<select id="countBy" parameterType="java.util.Map" resultType="long">
+		SELECT count(ID) FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+
+	<!-- 按查询条件删除 -->
+	<delete id="deleteBy">
+        DELETE FROM <include refid="table" /> 
+		<where>
+			<include refid="condition_sql" />
+		</where>
+    </delete>
+
+	<!-- 根据多个id查询 -->
+    <select id="listByIdList" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		WHERE ID IN 
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</select>
+
+	<!-- 根据id查询 -->
+    <select id="getById" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" /> 
+		WHERE ID = #{id,jdbcType=BIGINT}  
+	</select>
+
+	<!-- 按id主键删除 -->
+	<delete id="deleteById">
+        DELETE FROM <include refid="table" /> WHERE ID = #{id,jdbcType=BIGINT}
+    </delete>
+
+	<!-- 按多个id主键删除 -->
+	<delete id="deleteByIdList" parameterType="list">
+		DELETE FROM <include refid="table" />
+		WHERE ID IN 
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</delete>
+
+	<!-- ↑↑↑↑↑↑ 如果有新增字段、删除字段、修改字段 以上内容可用模板生成新内容后直接替换 ↑↑↑↑↑↑ -->
+	<!-- ↓↓↓↓↓↓ 以下内容是根据需求手动添加或修改的，请勿使用模板内容直接覆盖 ↓↓↓↓↓↓ -->
+
+	<sql id="condition_sql">
+		<if test="id != null ">
+			AND ID = #{id,jdbcType=BIGINT}
+		</if>
+		<if test="idList != null and idList.size() > 0">
+			AND ID IN <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+		</if>
+		<if test="accountNo != null and accountNo !='' ">
+			AND ACCOUNT_NO = #{accountNo,jdbcType=VARCHAR}
+		</if>
+		<if test="status != null ">
+			AND STATUS = #{status,jdbcType=TINYINT}
+		</if>
+	</sql>
+
+	<select id="getByAccountNo" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		WHERE ACCOUNT_NO = #{accountNo,jdbcType=VARCHAR}
+	</select>
+
+	<select id="listAccountNoPage" resultType="string">
+		SELECT ACCOUNT_NO FROM <include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+		limit #{offset},#{pageSize}
+	</select>
+
+	<update id="updateAccountSnapTime" parameterType="map">
+		UPDATE <include refid="table" />
+		SET VERSION = VERSION + 1,
+		NEXT_SNAP_TIME = #{nextSnapTime,jdbcType=INTEGER}
+		WHERE ACCOUNT_NO = #{accountNo,jdbcType=VARCHAR} and NEXT_SNAP_TIME = #{nextSnapTimeOld,jdbcType=INTEGER}
+	</update>
+</mapper>
+

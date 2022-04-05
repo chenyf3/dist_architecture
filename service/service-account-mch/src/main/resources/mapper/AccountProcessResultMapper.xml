@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.xpay.service.accountmch.entity.AccountProcessResult">
+	<sql id="table"> tbl_account_process_result </sql>
+
+	<!-- 用于返回的bean对象 -->
+	<resultMap id="BaseResultMap" type="com.xpay.service.accountmch.entity.AccountProcessResult">
+		<result column="ID" property="id" jdbcType="BIGINT"/>
+		<result column="VERSION" property="version" jdbcType="SMALLINT"/>
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="CREATE_DATE" property="createDate" jdbcType="DATE"/>
+		<result column="PROCESS_RESULT" property="processResult" jdbcType="SMALLINT"/>
+		<result column="ERR_CODE" property="errCode" jdbcType="INTEGER"/>
+		<result column="ERR_MSG" property="errMsg" jdbcType="VARCHAR"/>
+		<result column="CALLBACK_STAGE" property="callbackStage" jdbcType="TINYINT"/>
+		<result column="IS_FROM_ASYNC" property="isFromAsync" jdbcType="TINYINT"/>
+		<result column="REQUEST_DTO" property="requestDto" jdbcType="OTHER"/>
+		<result column="PROCESS_DTO" property="processDto" jdbcType="OTHER"/>
+		<result column="REMARK" property="remark" jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="Base_Column_List">
+		ID,
+		VERSION,
+		CREATE_TIME,
+		CREATE_DATE,
+		PROCESS_RESULT,
+		ERR_CODE,
+		ERR_MSG,
+		CALLBACK_STAGE,
+		IS_FROM_ASYNC,
+		REQUEST_DTO,
+		PROCESS_DTO,
+		REMARK
+	</sql>
+
+	<!-- 插入记录 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="AccountProcessResult">
+		INSERT INTO <include refid="table" /> (
+		VERSION,
+		CREATE_TIME,
+		CREATE_DATE,
+		PROCESS_RESULT,
+		ERR_CODE,
+		ERR_MSG,
+		CALLBACK_STAGE,
+		IS_FROM_ASYNC,
+		REQUEST_DTO,
+		PROCESS_DTO,
+		REMARK
+		) VALUES (
+		0,
+		#{createTime,jdbcType=TIMESTAMP},
+		#{createDate,jdbcType=DATE},
+		#{processResult,jdbcType=SMALLINT},
+		#{errCode,jdbcType=INTEGER},
+		#{errMsg,jdbcType=VARCHAR},
+		#{callbackStage,jdbcType=TINYINT},
+		#{isFromAsync,jdbcType=TINYINT},
+		#{requestDto,jdbcType=OTHER},
+		#{processDto,jdbcType=OTHER},
+		#{remark,jdbcType=VARCHAR}
+		)
+	</insert>
+
+	<!-- 批量插入记录 -->
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="id" parameterType="list">
+		INSERT INTO <include refid="table" /> (
+		VERSION,
+		CREATE_TIME,
+		CREATE_DATE,
+		PROCESS_RESULT,
+		ERR_CODE,
+		ERR_MSG,
+		CALLBACK_STAGE,
+		IS_FROM_ASYNC,
+		REQUEST_DTO,
+		PROCESS_DTO,
+		REMARK
+		) VALUES
+		<foreach collection="list" item="item" separator=",">
+			(
+			0,
+			#{item.createTime,jdbcType=TIMESTAMP},
+			#{item.createDate,jdbcType=DATE},
+			#{item.processResult,jdbcType=SMALLINT},
+			#{item.errCode,jdbcType=INTEGER},
+			#{item.errMsg,jdbcType=VARCHAR},
+			#{item.callbackStage,jdbcType=TINYINT},
+			#{item.isFromAsync,jdbcType=TINYINT},
+			#{item.requestDto,jdbcType=OTHER},
+			#{item.processDto,jdbcType=OTHER},
+			#{item.remark,jdbcType=VARCHAR}
+			)
+		</foreach>
+	</insert>
+
+	<!-- 更新 -->
+	<update id="update" parameterType="AccountProcessResult">
+		UPDATE <include refid="table" />
+		<set>
+			VERSION = #{version,jdbcType=SMALLINT} + 1,
+			CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+			CREATE_DATE = #{createDate,jdbcType=DATE},
+			PROCESS_RESULT = #{processResult,jdbcType=SMALLINT},
+			ERR_CODE = #{errCode,jdbcType=INTEGER},
+			ERR_MSG = #{errMsg,jdbcType=VARCHAR},
+			CALLBACK_STAGE = #{callbackStage,jdbcType=TINYINT},
+			IS_FROM_ASYNC = #{isFromAsync,jdbcType=TINYINT},
+			REQUEST_DTO = #{requestDto,jdbcType=OTHER},
+			PROCESS_DTO = #{processDto,jdbcType=OTHER},
+			REMARK = #{remark,jdbcType=VARCHAR}
+		</set>
+		WHERE ID = #{id,jdbcType=BIGINT} and VERSION = #{version,jdbcType=SMALLINT}
+	</update>
+
+	<!-- 只更新不为null的属性 -->
+	<update id="updateIfNotNull" parameterType="AccountProcessResult">
+		UPDATE <include refid="table" />
+		<set>
+			VERSION = #{version,jdbcType=SMALLINT} + 1,
+			<if test="createTime != null">
+				CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createDate != null">
+				CREATE_DATE = #{createDate,jdbcType=DATE},
+			</if>
+			<if test="processResult != null">
+				PROCESS_RESULT = #{processResult,jdbcType=SMALLINT},
+			</if>
+			<if test="errCode != null">
+				ERR_CODE = #{errCode,jdbcType=INTEGER},
+			</if>
+			<if test="errMsg != null">
+				ERR_MSG = #{errMsg,jdbcType=VARCHAR},
+			</if>
+			<if test="callbackStage != null">
+				CALLBACK_STAGE = #{callbackStage,jdbcType=TINYINT},
+			</if>
+			<if test="isFromAsync != null">
+				IS_FROM_ASYNC = #{isFromAsync,jdbcType=TINYINT},
+			</if>
+			<if test="requestDto != null">
+				REQUEST_DTO = #{requestDto,jdbcType=OTHER},
+			</if>
+			<if test="processDto != null">
+				PROCESS_DTO = #{processDto,jdbcType=OTHER},
+			</if>
+			<if test="remark != null">
+				REMARK = #{remark,jdbcType=VARCHAR}
+			</if>
+		</set>
+		WHERE ID = #{id,jdbcType=BIGINT} and VERSION = #{version,jdbcType=SMALLINT}
+	</update>
+
+	<!-- 多条件组合查询 -->
+	<select id="listBy" parameterType="java.util.Map" resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+		<choose>
+			<when test="sortColumns != null and sortColumns !='' ">
+				<![CDATA[ ORDER BY ${sortColumns} ]]>
+			</when>
+			<otherwise>
+				<![CDATA[ ORDER BY ID DESC ]]>
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 根据多条件组合查询，计算总记录数 -->
+	<select id="countBy" parameterType="java.util.Map" resultType="long">
+		SELECT count(ID) FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+
+	<!-- 按查询条件删除 -->
+	<delete id="deleteBy">
+		DELETE FROM <include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</delete>
+
+	<!-- 根据多个id查询 -->
+	<select id="listByIdList" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		WHERE ID IN
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</select>
+
+	<!-- 根据id查询 -->
+	<select id="getById" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		WHERE ID = #{id,jdbcType=BIGINT}
+	</select>
+
+	<!-- 按id主键删除 -->
+	<delete id="deleteById">
+		DELETE FROM <include refid="table" /> WHERE ID = #{id,jdbcType=BIGINT}
+	</delete>
+
+	<!-- 按多个id主键删除 -->
+	<delete id="deleteByIdList" parameterType="list">
+		DELETE FROM <include refid="table" />
+		WHERE ID IN
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</delete>
+
+	<!-- ↑↑↑↑↑↑ 如果有新增字段、删除字段、修改字段 以上内容可用模板生成新内容后直接替换 ↑↑↑↑↑↑ -->
+	<!-- ↓↓↓↓↓↓ 以下内容是根据需求手动添加或修改的，请勿使用模板内容直接覆盖 ↓↓↓↓↓↓ -->
+
+	<sql id="condition_sql">
+		<if test="id != null ">
+			AND ID = #{id,jdbcType=BIGINT}
+		</if>
+		<if test="idList != null and idList.size() > 0">
+			AND ID IN <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+		</if>
+		<if test="createDate != null ">
+			AND CREATE_DATE = #{createDate,jdbcType=DATE}
+		</if>
+		<if test="createDateList != null and createDateList.size() > 0">
+			AND CREATE_DATE IN <foreach collection="createDateList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=DATE}</foreach>
+		</if>
+		<if test="createTimeBegin != null and createTimeEnd != null ">
+			AND CREATE_TIME BETWEEN #{createTimeBegin,jdbcType=TIMESTAMP} AND #{createTimeEnd,jdbcType=TIMESTAMP}
+		</if>
+		<if test="processResult != null ">
+			AND PROCESS_RESULT = #{processResult,jdbcType=SMALLINT}
+		</if>
+		<if test="errCode != null ">
+			AND ERR_CODE = #{errCode,jdbcType=INTEGER}
+		</if>
+		<if test="callbackStage != null ">
+			AND CALLBACK_STAGE = #{callbackStage,jdbcType=TINYINT}
+		</if>
+		<if test="isFromAsync != null ">
+			AND IS_FROM_ASYNC = #{isFromAsync,jdbcType=TINYINT}
+		</if>
+		<if test="trxNo != null and trxNo !='' ">
+			AND JSON_CONTAINS(PROCESS_DTO, JSON_OBJECT('trxNo', #{trxNo}))
+		</if>
+		<if test="accountNo != null and accountNo !='' ">
+			AND JSON_CONTAINS(PROCESS_DTO, JSON_OBJECT('accountNo', #{accountNo}))
+		</if>
+	</sql>
+
+	<select id="listAccountProcessResultId" parameterType="java.util.Map" resultType="long">
+		select ID from <include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+		limit #{offset},#{limit}
+	</select>
+
+	<!-- 跟数据迁移相关的语句 START -->
+	<select id="listNeedMigrateDates" parameterType="map" resultType="java.util.Date">
+		select CREATE_DATE from <include refid="table" /> WHERE CREATE_DATE <![CDATA[ <= ]]> #{migrationEndDate,jdbcType=DATE} GROUP BY CREATE_DATE
+	</select>
+	<select id="listIdsForMigration" parameterType="map" resultType="long">
+		SELECT ID from <include refid="table" />
+		WHERE CREATE_DATE = #{currMigrateDate,jdbcType=DATE} AND CALLBACK_STAGE IN (3,4) limit #{migrateNumPerTime}
+	</select>
+	<insert id="migrateToHistoryByIds" parameterType="map">
+		INSERT INTO tbl_account_process_result_history
+		(ID,VERSION,CREATE_TIME,CREATE_DATE,PROCESS_RESULT,ERR_CODE,ERR_MSG
+		CALLBACK_STAGE,IS_FROM_ASYNC,REQUEST_DTO,PROCESS_DTO,REMARK,MIGRATION_TIME)
+		SELECT ID,VERSION,CREATE_TIME,CREATE_DATE,PROCESS_RESULT,ERR_CODE,ERR_MSG
+		CALLBACK_STAGE,IS_FROM_ASYNC,REQUEST_DTO,PROCESS_DTO,REMARK,now()
+		FROM <include refid="table" />
+		WHERE ID IN <foreach collection="recordIdList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</insert>
+	<delete id="deleteRecordByIdList" parameterType="map">
+		delete from <include refid="table" />
+		where ID IN <foreach collection="recordIdList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</delete>
+	<!-- 跟数据迁移相关的语句 END -->
+</mapper>
+

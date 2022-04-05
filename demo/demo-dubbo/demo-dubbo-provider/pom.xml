@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>demo-dubbo</artifactId>
+        <groupId>com.xpay</groupId>
+        <version>1.0-Release</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>demo-dubbo-provider</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency> <!-- 使用nacos作为配置中心时引入 -->
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
+
+        <!-- dubbo START -->
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-spring-boot-starter</artifactId>
+        </dependency>
+<!--        <dependency>&lt;!&ndash; 使用 zookeeper 作为Dubbo注册中心时引入 &ndash;&gt;-->
+<!--            <groupId>org.apache.dubbo</groupId>-->
+<!--            <artifactId>dubbo-dependencies-zookeeper</artifactId>-->
+<!--            <type>pom</type>-->
+<!--        </dependency>-->
+        <dependency><!-- 使用 Nacos 作为Dubbo注册中心时引入 -->
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-registry-nacos</artifactId>
+        </dependency>
+        <dependency><!-- 使用 Nacos 作为Dubbo注册中心时引入 -->
+            <groupId>com.alibaba.nacos</groupId>
+            <artifactId>nacos-client</artifactId>
+        </dependency>
+        <dependency><!-- org.apache.dubbo.registry.nacos.NacosRegistry 中依赖了此模块 -->
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <!-- dubbo END -->
+
+        <!--
+        当使用nacos作为dubbo的注册中心时，dubbo-2.7.8.jar 和 dubbo-remoting-api-2.7.8.jar 会有如下类重复，在启动时会报ERROR日志
+         org/apache/dubbo/remoting/exchange/Exchangers
+         org/apache/dubbo/remoting/Transporters
+         org/apache/dubbo/remoting/RemotingException
+         -->
+
+        <dependency>
+            <groupId>com.xpay</groupId>
+            <artifactId>demo-dubbo-facade</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+</project>

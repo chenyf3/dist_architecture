@@ -1,0 +1,1 @@
+[{"app":"gateway-api","count":50.0,"gmtCreate":1632726558527,"gmtModified":1632728110183,"grade":0,"id":1,"ip":"192.168.107.46","limitApp":"default","minRequestAmount":5,"port":8712,"resource":"backend-nosen","slowRatioThreshold":0.3,"statIntervalMs":2000,"timeWindow":2}]

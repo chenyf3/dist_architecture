@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.xpay.service.user.entity.PortalUser">
+	<sql id="table"> tbl_portal_user </sql>
+
+	<!-- 用于返回的bean对象 -->
+	<resultMap id="BaseResultMap" type="com.xpay.service.user.entity.PortalUser">
+		<result column="ID" property="id" jdbcType="BIGINT"/>
+		<result column="VERSION" property="version" jdbcType="INTEGER"/>
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="LOGIN_NAME" property="loginName" jdbcType="VARCHAR"/>
+		<result column="LOGIN_PWD" property="loginPwd" jdbcType="VARCHAR"/>
+		<result column="REAL_NAME" property="realName" jdbcType="VARCHAR"/>
+		<result column="MOBILE_NO" property="mobileNo" jdbcType="VARCHAR"/>
+		<result column="EMAIL" property="email" jdbcType="VARCHAR"/>
+		<result column="STATUS" property="status" jdbcType="TINYINT"/>
+		<result column="TYPE" property="type" jdbcType="SMALLINT"/>
+		<result column="MCH_NO" property="mchNo" jdbcType="VARCHAR"/>
+		<result column="MCH_TYPE" property="mchType" jdbcType="SMALLINT"/>
+		<result column="ORG_NO" property="orgNo" jdbcType="VARCHAR"/>
+		<result column="CREATOR" property="creator" jdbcType="VARCHAR"/>
+		<result column="MODIFIER" property="modifier" jdbcType="VARCHAR"/>
+		<result column="REMARK" property="remark" jdbcType="VARCHAR"/>
+		<result column="EXTRA_INFO" property="extraInfo" jdbcType="OTHER"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="Base_Column_List">
+		ID,
+		VERSION,
+		CREATE_TIME,
+		LOGIN_NAME,
+		LOGIN_PWD,
+		REAL_NAME,
+		MOBILE_NO,
+		EMAIL,
+		STATUS,
+		TYPE,
+		MCH_NO,
+		MCH_TYPE,
+		ORG_NO,
+		CREATOR,
+		MODIFIER,
+		REMARK,
+		EXTRA_INFO
+	</sql>
+
+	<!-- 插入记录 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="PortalUser">
+		INSERT INTO <include refid="table" /> (
+		VERSION,
+		CREATE_TIME,
+		LOGIN_NAME,
+		LOGIN_PWD,
+		REAL_NAME,
+		MOBILE_NO,
+		EMAIL,
+		STATUS,
+		TYPE,
+		MCH_NO,
+		MCH_TYPE,
+		ORG_NO,
+		CREATOR,
+		MODIFIER,
+		REMARK,
+		EXTRA_INFO
+		) VALUES (
+		0,
+		#{createTime,jdbcType=TIMESTAMP},
+		#{loginName,jdbcType=VARCHAR},
+		#{loginPwd,jdbcType=VARCHAR},
+		#{realName,jdbcType=VARCHAR},
+		#{mobileNo,jdbcType=VARCHAR},
+		#{email,jdbcType=VARCHAR},
+		#{status,jdbcType=TINYINT},
+		#{type,jdbcType=SMALLINT},
+		#{mchNo,jdbcType=VARCHAR},
+		#{mchType,jdbcType=SMALLINT},
+		#{orgNo,jdbcType=VARCHAR},
+		#{creator,jdbcType=VARCHAR},
+		#{modifier,jdbcType=VARCHAR},
+		#{remark,jdbcType=VARCHAR},
+		#{extraInfo,jdbcType=OTHER}
+		)
+	</insert>
+
+	<!-- 批量插入记录 -->
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="id" parameterType="list">
+		INSERT INTO <include refid="table" /> (
+		VERSION,
+		CREATE_TIME,
+		LOGIN_NAME,
+		LOGIN_PWD,
+		REAL_NAME,
+		MOBILE_NO,
+		EMAIL,
+		STATUS,
+		TYPE,
+		MCH_NO,
+		MCH_TYPE,
+		ORG_NO,
+		CREATOR,
+		MODIFIER,
+		REMARK,
+		EXTRA_INFO
+		) VALUES
+		<foreach collection="list" item="item" separator=",">
+			(
+			0,
+			#{item.createTime,jdbcType=TIMESTAMP},
+			#{item.loginName,jdbcType=VARCHAR},
+			#{item.loginPwd,jdbcType=VARCHAR},
+			#{item.realName,jdbcType=VARCHAR},
+			#{item.mobileNo,jdbcType=VARCHAR},
+			#{item.email,jdbcType=VARCHAR},
+			#{item.status,jdbcType=TINYINT},
+			#{item.type,jdbcType=SMALLINT},
+			#{item.mchNo,jdbcType=VARCHAR},
+			#{item.mchType,jdbcType=SMALLINT},
+			#{item.orgNo,jdbcType=VARCHAR},
+			#{item.creator,jdbcType=VARCHAR},
+			#{item.modifier,jdbcType=VARCHAR},
+			#{item.remark,jdbcType=VARCHAR},
+			#{item.extraInfo,jdbcType=OTHER}
+			)
+		</foreach>
+	</insert>
+
+	<!-- 更新 -->
+	<update id="update" parameterType="PortalUser">
+		UPDATE <include refid="table" />
+		<set>
+			VERSION = #{version,jdbcType=INTEGER} + 1,
+			CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+			LOGIN_NAME = #{loginName,jdbcType=VARCHAR},
+			LOGIN_PWD = #{loginPwd,jdbcType=VARCHAR},
+			REAL_NAME = #{realName,jdbcType=VARCHAR},
+			MOBILE_NO = #{mobileNo,jdbcType=VARCHAR},
+			EMAIL = #{email,jdbcType=VARCHAR},
+			STATUS = #{status,jdbcType=TINYINT},
+			TYPE = #{type,jdbcType=SMALLINT},
+			MCH_NO = #{mchNo,jdbcType=VARCHAR},
+			MCH_TYPE = #{mchType,jdbcType=SMALLINT},
+			ORG_NO = #{orgNo,jdbcType=VARCHAR},
+			CREATOR = #{creator,jdbcType=VARCHAR},
+			MODIFIER = #{modifier,jdbcType=VARCHAR},
+			REMARK = #{remark,jdbcType=VARCHAR},
+			EXTRA_INFO = #{extraInfo,jdbcType=OTHER}
+		</set>
+		WHERE ID = #{id,jdbcType=BIGINT} and VERSION = #{version,jdbcType=INTEGER}
+	</update>
+
+	<!-- 只更新不为null的属性 -->
+	<update id="updateIfNotNull" parameterType="PortalUser">
+		UPDATE <include refid="table" />
+		<set>
+			VERSION = #{version,jdbcType=INTEGER} + 1,
+			<if test="createTime != null">
+				CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="loginName != null">
+				LOGIN_NAME = #{loginName,jdbcType=VARCHAR},
+			</if>
+			<if test="loginPwd != null">
+				LOGIN_PWD = #{loginPwd,jdbcType=VARCHAR},
+			</if>
+			<if test="realName != null">
+				REAL_NAME = #{realName,jdbcType=VARCHAR},
+			</if>
+			<if test="mobileNo != null">
+				MOBILE_NO = #{mobileNo,jdbcType=VARCHAR},
+			</if>
+			<if test="email != null">
+				EMAIL = #{email,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null">
+				STATUS = #{status,jdbcType=TINYINT},
+			</if>
+			<if test="type != null">
+				TYPE = #{type,jdbcType=SMALLINT},
+			</if>
+			<if test="mchNo != null">
+				MCH_NO = #{mchNo,jdbcType=VARCHAR},
+			</if>
+			<if test="mchType != null">
+				MCH_TYPE = #{mchType,jdbcType=SMALLINT},
+			</if>
+			<if test="orgNo != null">
+				ORG_NO = #{orgNo,jdbcType=VARCHAR},
+			</if>
+			<if test="creator != null">
+				CREATOR = #{creator,jdbcType=VARCHAR},
+			</if>
+			<if test="modifier != null">
+				MODIFIER = #{modifier,jdbcType=VARCHAR},
+			</if>
+			<if test="remark != null">
+				REMARK = #{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="extraInfo != null">
+				EXTRA_INFO = #{extraInfo,jdbcType=OTHER}
+			</if>
+		</set>
+		WHERE ID = #{id,jdbcType=BIGINT} and VERSION = #{version,jdbcType=INTEGER}
+	</update>
+
+	<!-- 多条件组合查询 -->
+	<select id="listBy" parameterType="java.util.Map" resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+		<choose>
+			<when test="sortColumns != null and sortColumns !='' ">
+				<![CDATA[ ORDER BY ${sortColumns} ]]>
+			</when>
+			<otherwise>
+				<![CDATA[ ORDER BY ID DESC ]]>
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 根据多条件组合查询，计算总记录数 -->
+	<select id="countBy" parameterType="java.util.Map" resultType="long">
+		SELECT count(ID) FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+
+	<!-- 按查询条件删除 -->
+	<delete id="deleteBy">
+		DELETE FROM <include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</delete>
+
+	<!-- 根据多个id查询 -->
+	<select id="listByIdList" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		WHERE ID IN
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</select>
+
+	<!-- 根据id查询 -->
+	<select id="getById" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		WHERE ID = #{id,jdbcType=BIGINT}
+	</select>
+
+	<!-- 按id主键删除 -->
+	<delete id="deleteById">
+		DELETE FROM <include refid="table" /> WHERE ID = #{id,jdbcType=BIGINT}
+	</delete>
+
+	<!-- 按多个id主键删除 -->
+	<delete id="deleteByIdList" parameterType="list">
+		DELETE FROM <include refid="table" />
+		WHERE ID IN
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</delete>
+
+	<!-- ↑↑↑↑↑↑ 如果有新增字段、删除字段、修改字段 以上内容可用模板生成新内容后直接替换 ↑↑↑↑↑↑ -->
+	<!-- ↓↓↓↓↓↓ 以下内容是根据需求手动添加或修改的，请勿使用模板内容直接覆盖 ↓↓↓↓↓↓ -->
+
+	<sql id="condition_sql">
+		<if test="id != null ">
+			AND ID = #{id,jdbcType=BIGINT}
+		</if>
+		<if test="idList != null and idList.size() > 0">
+			AND ID IN <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+		</if>
+		<if test="version != null ">
+			AND VERSION = #{version,jdbcType=INTEGER}
+		</if>
+		<if test="createTime != null ">
+			AND CREATE_TIME = #{createTime,jdbcType=TIMESTAMP}
+		</if>
+		<if test="loginName != null and loginName !='' ">
+			AND LOGIN_NAME = #{loginName,jdbcType=VARCHAR}
+		</if>
+		<if test="loginPwd != null and loginPwd !='' ">
+			AND LOGIN_PWD = #{loginPwd,jdbcType=VARCHAR}
+		</if>
+		<if test="realName != null and realName !='' ">
+			AND REAL_NAME = #{realName,jdbcType=VARCHAR}
+		</if>
+		<if test="mobileNo != null and mobileNo !='' ">
+			AND MOBILE_NO = #{mobileNo,jdbcType=VARCHAR}
+		</if>
+		<if test="email != null and email !='' ">
+			AND EMAIL = #{email,jdbcType=VARCHAR}
+		</if>
+		<if test="status != null ">
+			AND STATUS = #{status,jdbcType=TINYINT}
+		</if>
+		<if test="type != null ">
+			AND TYPE = #{type,jdbcType=SMALLINT}
+		</if>
+		<if test="mchNo != null and mchNo !='' ">
+			AND MCH_NO = #{mchNo,jdbcType=VARCHAR}
+		</if>
+		<if test="mchType != null ">
+			AND MCH_TYPE = #{mchType,jdbcType=SMALLINT}
+		</if>
+		<if test="orgNo != null and orgNo !='' ">
+			AND ORG_NO = #{orgNo,jdbcType=VARCHAR}
+		</if>
+		<if test="creator != null and creator !='' ">
+			AND CREATOR = #{creator,jdbcType=VARCHAR}
+		</if>
+		<if test="modifier != null and modifier !='' ">
+			AND MODIFIER = #{modifier,jdbcType=VARCHAR}
+		</if>
+		<if test="remark != null and remark !='' ">
+			AND REMARK = #{remark,jdbcType=VARCHAR}
+		</if>
+		<if test="extraInfo != null and extraInfo !='' ">
+			AND EXTRA_INFO = #{extraInfo,jdbcType=OTHER}
+		</if>
+	</sql>
+
+	<select id="listByRoleId" parameterType="java.util.Map" resultMap="BaseResultMap">
+		select O.* from <include refid="table"/> O
+		LEFT JOIN tbl_portal_role_user RO
+		ON O.ID = RO.USER_ID WHERE RO.ROLE_ID = #{roleId}
+	</select>
+
+	<select id="listUserIdByMap" parameterType="java.util.Map" resultType="long">
+		select ID from <include refid="table"/>
+		<where>
+			<include refid="condition_sql"/>
+		</where>
+	</select>
+
+	<select id="listMchNoByUserIdList" parameterType="java.util.Map" resultType="string">
+		select DISTINCT MCH_NO from <include refid="table"/>
+		<where>
+			ID IN <foreach collection="userIdList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+		</where>
+	</select>
+</mapper>
+

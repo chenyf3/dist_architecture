@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>demo-redis</artifactId>
+        <groupId>com.xpay</groupId>
+        <version>1.0-Release</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>demo-redis-single</artifactId>
+    <description>测试分布式锁、限流器、Spring缓存、RedisClient 共用同一个redis集群的情况</description>
+
+    <dependencies>
+        <!-- redis -->
+        <dependency> <!-- redis 基础包，RedisClient实例会与此共用 RedisConnectionFactory -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+        <!--
+        redis客户端选择建议：在redis服务端可承受范围内，jedis吞吐量要优于lettuce、redisson，但jedis的弊端也明显，会占用大量连接资源，而
+        lettuce和redisson由于采用了多路复用的技术，其占用连接池数量很小，随着客户端并发请求增长，这两者表现整体很平稳，简单测试来看，redisson的
+        吞吐量要高于lettuce
+         -->
+<!--        <dependency> &lt;!&ndash; 使用lettuce作为redis的客户端时引入，lettuce/jedis/redisson 三选一即可 &ndash;&gt;-->
+<!--            <groupId>io.lettuce</groupId>-->
+<!--            <artifactId>lettuce-core</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency> &lt;!&ndash; 使用lettuce作为spring-data-redis的客户端实现类且有用到连接池时引入 &ndash;&gt;-->
+<!--            <groupId>org.apache.commons</groupId>-->
+<!--            <artifactId>commons-pool2</artifactId>-->
+<!--        </dependency>-->
+        <dependency> <!-- 使用jedis作为spring-data-redis的客户端实现类时引入，lettuce/jedis/redisson 三选一即可 -->
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+        </dependency>
+<!--        <dependency> &lt;!&ndash; 使用redisson作为spring-data-redis的客户端实现类时引入，lettuce/jedis/redisson 三选一即可 &ndash;&gt;-->
+<!--            <groupId>org.redisson</groupId>-->
+<!--            <artifactId>redisson-spring-boot-starter</artifactId>-->
+<!--        </dependency>-->
+
+        <dependency><!-- 需要用到 RedisLock 分布式锁时引入 -->
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+        </dependency>
+        <dependency><!-- 需要用到 @Cacheable 注解时引入 -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        <!-- redis -->
+
+        <dependency> <!-- 使用nacos作为配置中心时引入 -->
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.xpay</groupId>
+            <artifactId>starter-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.xpay</groupId>
+            <artifactId>common-statics</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.xpay</groupId>
+            <artifactId>common-util</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

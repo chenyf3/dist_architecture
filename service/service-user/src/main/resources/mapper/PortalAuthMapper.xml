@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.xpay.service.user.entity.PortalAuth">
+	<sql id="table"> tbl_portal_auth </sql>
+	<sql id="portal_role_auth"> tbl_portal_role_auth </sql>
+
+	<!-- 用于返回的bean对象 -->
+	<resultMap id="BaseResultMap" type="com.xpay.service.user.entity.PortalAuth">
+		<result column="ID" property="id" jdbcType="BIGINT"/>
+		<result column="VERSION" property="version" jdbcType="INTEGER"/>
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="NAME" property="name" jdbcType="VARCHAR"/>
+		<result column="NUMBER" property="number" jdbcType="VARCHAR"/>
+		<result column="PARENT_ID" property="parentId" jdbcType="BIGINT"/>
+		<result column="PERMISSION_FLAG" property="permissionFlag" jdbcType="VARCHAR"/>
+		<result column="AUTH_TYPE" property="authType" jdbcType="SMALLINT"/>
+		<result column="URL" property="url" jdbcType="VARCHAR"/>
+		<result column="ICON" property="icon" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="Base_Column_List">
+		ID,
+		VERSION,
+		CREATE_TIME,
+		NAME,
+		NUMBER,
+		PARENT_ID,
+		PERMISSION_FLAG,
+		AUTH_TYPE,
+		URL,
+		ICON
+	</sql>
+
+	<!-- 插入记录 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="PortalAuth">
+		INSERT INTO <include refid="table" /> (
+        	VERSION,
+        	CREATE_TIME,
+        	NAME,
+        	NUMBER,
+        	PARENT_ID,
+        	PERMISSION_FLAG,
+        	AUTH_TYPE,
+        	URL,
+        	ICON
+        ) VALUES (
+			0,
+			#{createTime,jdbcType=TIMESTAMP},
+			#{name,jdbcType=VARCHAR},
+			#{number,jdbcType=VARCHAR},
+			#{parentId,jdbcType=BIGINT},
+			#{permissionFlag,jdbcType=VARCHAR},
+			#{authType,jdbcType=SMALLINT},
+			#{url,jdbcType=VARCHAR},
+			#{icon,jdbcType=VARCHAR}
+        )
+	</insert>
+
+	<!-- 批量插入记录 -->
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="id" parameterType="list">
+		INSERT INTO <include refid="table" /> (
+        	VERSION,
+        	CREATE_TIME,
+        	NAME,
+        	NUMBER,
+        	PARENT_ID,
+        	PERMISSION_FLAG,
+        	AUTH_TYPE,
+        	URL,
+        	ICON
+        ) VALUES 
+			<foreach collection="list" item="item" separator=",">
+			(
+			0,
+			#{item.createTime,jdbcType=TIMESTAMP},
+			#{item.name,jdbcType=VARCHAR},
+			#{item.number,jdbcType=VARCHAR},
+			#{item.parentId,jdbcType=BIGINT},
+			#{item.permissionFlag,jdbcType=VARCHAR},
+			#{item.authType,jdbcType=SMALLINT},
+			#{item.url,jdbcType=VARCHAR},
+			#{item.icon,jdbcType=VARCHAR}
+			)
+			</foreach>
+	</insert>
+
+	<!-- 更新 -->
+	<update id="update" parameterType="PortalAuth">
+        UPDATE <include refid="table" />
+		<set>
+			VERSION = #{version,jdbcType=INTEGER} + 1,
+			CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+			NAME = #{name,jdbcType=VARCHAR},
+			NUMBER = #{number,jdbcType=VARCHAR},
+			PARENT_ID = #{parentId,jdbcType=BIGINT},
+			PERMISSION_FLAG = #{permissionFlag,jdbcType=VARCHAR},
+			AUTH_TYPE = #{authType,jdbcType=SMALLINT},
+			URL = #{url,jdbcType=VARCHAR},
+			ICON = #{icon,jdbcType=VARCHAR}
+		</set>
+        WHERE ID = #{id,jdbcType=BIGINT} and VERSION = #{version,jdbcType=INTEGER}
+	</update>
+
+	<!-- 只更新不为null的属性 -->
+	<update id="updateIfNotNull" parameterType="PortalAuth">
+		UPDATE <include refid="table" />
+		<set>
+			VERSION = #{version,jdbcType=INTEGER} + 1,
+			<if test="createTime != null">
+				CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="name != null">
+				NAME = #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="number != null">
+				NUMBER = #{number,jdbcType=VARCHAR},
+			</if>
+			<if test="parentId != null">
+				PARENT_ID = #{parentId,jdbcType=BIGINT},
+			</if>
+			<if test="permissionFlag != null">
+				PERMISSION_FLAG = #{permissionFlag,jdbcType=VARCHAR},
+			</if>
+			<if test="authType != null">
+				AUTH_TYPE = #{authType,jdbcType=SMALLINT},
+			</if>
+			<if test="url != null">
+				URL = #{url,jdbcType=VARCHAR},
+			</if>
+			<if test="icon != null">
+				ICON = #{icon,jdbcType=VARCHAR}
+			</if>
+		</set>
+		WHERE ID = #{id,jdbcType=BIGINT} and VERSION = #{version,jdbcType=INTEGER}
+	</update>
+	
+	<!-- 多条件组合查询 -->
+	<select id="listBy" parameterType="java.util.Map" resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+		<choose>
+			<when test="sortColumns != null and sortColumns !='' ">
+				<![CDATA[ ORDER BY ${sortColumns} ]]>
+			</when>
+			<otherwise>
+				<![CDATA[ ORDER BY ID DESC ]]>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 根据多条件组合查询，计算总记录数 -->
+	<select id="countBy" parameterType="java.util.Map" resultType="long">
+		SELECT count(ID) FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+
+	<!-- 按查询条件删除 -->
+	<delete id="deleteBy">
+        DELETE FROM <include refid="table" /> 
+		<where>
+			<include refid="condition_sql" />
+		</where>
+    </delete>
+
+	<!-- 根据多个id查询 -->
+    <select id="listByIdList" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		WHERE ID IN 
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</select>
+
+	<!-- 根据id查询 -->
+    <select id="getById" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" /> 
+		WHERE ID = #{id,jdbcType=BIGINT}  
+	</select>
+
+	<!-- 按id主键删除 -->
+	<delete id="deleteById">
+        DELETE FROM <include refid="table" /> WHERE ID = #{id,jdbcType=BIGINT}
+    </delete>
+
+	<!-- 按多个id主键删除 -->
+	<delete id="deleteByIdList" parameterType="list">
+		DELETE FROM <include refid="table" />
+		WHERE ID IN 
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</delete>
+
+	<!-- ↑↑↑↑↑↑ 如果有新增字段、删除字段、修改字段 以上内容可用模板生成新内容后直接替换 ↑↑↑↑↑↑ -->
+	<!-- ↓↓↓↓↓↓ 以下内容是根据需求手动添加或修改的，请勿使用模板内容直接覆盖 ↓↓↓↓↓↓ -->
+
+	<sql id="condition_sql">
+		<if test="id != null ">
+			AND ID = #{id,jdbcType=BIGINT}
+		</if>
+		<if test="idList != null and idList.size() > 0">
+			AND ID IN <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+		</if>
+		<if test="version != null ">
+			AND VERSION = #{version,jdbcType=INTEGER}
+		</if>
+		<if test="createTime != null ">
+			AND CREATE_TIME = #{createTime,jdbcType=TIMESTAMP}
+		</if>
+		<if test="name != null and name !='' ">
+			AND NAME = #{name,jdbcType=VARCHAR}
+		</if>
+		<if test="number != null and number !='' ">
+			AND NUMBER = #{number,jdbcType=VARCHAR}
+		</if>
+		<if test="parentId != null ">
+			AND PARENT_ID = #{parentId,jdbcType=BIGINT}
+		</if>
+		<if test="permissionFlag != null and permissionFlag !='' ">
+			AND PERMISSION_FLAG = #{permissionFlag,jdbcType=VARCHAR}
+		</if>
+		<if test="authType != null ">
+			AND AUTH_TYPE = #{authType,jdbcType=SMALLINT}
+		</if>
+		<if test="url != null and url !='' ">
+			AND URL = #{url,jdbcType=VARCHAR}
+		</if>
+		<if test="icon != null and icon !='' ">
+			AND ICON = #{icon,jdbcType=VARCHAR}
+		</if>
+	</sql>
+
+	<select id="listByRoleIds" parameterType="java.util.Map" resultMap="BaseResultMap">
+		SELECT DISTINCT * FROM (
+		SELECT F.* FROM <include refid="portal_role_auth"/> RA
+		INNER JOIN <include refid="table"/> F
+		ON RA.AUTH_ID = F.ID
+		where RA.ROLE_ID IN
+		<foreach item="item" index="index" collection="roleIds" open="(" separator="," close=")">#{item}</foreach>
+		) AS FT ORDER BY FT.number ASC
+	</select>
+
+	<select id="listByParentId" parameterType="java.util.Map" resultMap="BaseResultMap">
+		SELECT * FROM <include refid="table"/>
+		WHERE PARENT_ID = #{parentId,jdbcType=BIGINT}
+		ORDER BY NUMBER ASC
+	</select>
+
+	<select id="getBrotherMaximalNumber" parameterType="long" resultType="string">
+		SELECT NUMBER FROM <include refid="table"/>
+		WHERE PARENT_ID = #{parentId,jdbcType=BIGINT}
+		ORDER BY NUMBER DESC limit 1
+	</select>
+</mapper>
+

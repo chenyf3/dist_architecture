@@ -1,0 +1,12 @@
+# Auto Configuration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.xpay.starter.plugin.config.RedisAutoConfiguration,\
+com.xpay.starter.plugin.config.ZookeeperLockAutoConfiguration,\
+com.xpay.starter.plugin.config.AMQAutoConfiguration,\
+com.xpay.starter.plugin.config.RMQAutoConfiguration,\
+com.xpay.starter.plugin.config.RAQAutoConfiguration,\
+com.xpay.starter.plugin.config.EmailAutoConfiguration,\
+com.xpay.starter.plugin.config.FastdfsAutoConfiguration,\
+com.xpay.starter.plugin.config.MinioAutoConfiguration,\
+com.xpay.starter.plugin.config.OSSAutoConfiguration,\
+com.xpay.starter.plugin.config.EsAutoConfiguration

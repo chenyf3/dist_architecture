@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.xpay.service.merchant.entity.MerchantDetail">
+	<sql id="table"> tbl_merchant_detail </sql>
+
+	<!-- 用于返回的bean对象 -->
+	<resultMap id="BaseResultMap" type="com.xpay.service.merchant.entity.MerchantDetail">
+		<result column="ID" property="id" jdbcType="BIGINT"/>
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="VERSION" property="version" jdbcType="INTEGER"/>
+		<result column="MODIFY_TIME" property="modifyTime" jdbcType="TIMESTAMP"/>
+		<result column="MCH_NO" property="mchNo" jdbcType="VARCHAR"/>
+		<result column="ADDRESS" property="address" jdbcType="VARCHAR"/>
+		<result column="URL" property="url" jdbcType="VARCHAR"/>
+		<result column="ICP" property="icp" jdbcType="VARCHAR"/>
+		<result column="TELEPHONE" property="telephone" jdbcType="VARCHAR"/>
+		<result column="BUSS_MOBILE_NO" property="bussMobileNo" jdbcType="VARCHAR"/>
+		<result column="BUSS_CONTACT_EMAIL" property="bussContactEmail" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="Base_Column_List">
+		ID,
+		CREATE_TIME,
+		VERSION,
+		MODIFY_TIME,
+		MCH_NO,
+		ADDRESS,
+		URL,
+		ICP,
+		TELEPHONE,
+		BUSS_MOBILE_NO,
+		BUSS_CONTACT_EMAIL
+	</sql>
+
+	<!-- 插入记录 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="MerchantDetail">
+		INSERT INTO <include refid="table" /> (
+        	CREATE_TIME,
+        	VERSION,
+        	MODIFY_TIME,
+        	MCH_NO,
+        	ADDRESS,
+        	URL,
+        	ICP,
+        	TELEPHONE,
+        	BUSS_MOBILE_NO,
+        	BUSS_CONTACT_EMAIL
+        ) VALUES (
+			#{createTime,jdbcType=TIMESTAMP},
+			0,
+			#{modifyTime,jdbcType=TIMESTAMP},
+			#{mchNo,jdbcType=VARCHAR},
+			#{address,jdbcType=VARCHAR},
+			#{url,jdbcType=VARCHAR},
+			#{icp,jdbcType=VARCHAR},
+			#{telephone,jdbcType=VARCHAR},
+			#{bussMobileNo,jdbcType=VARCHAR},
+			#{bussContactEmail,jdbcType=VARCHAR}
+        )
+	</insert>
+
+	<!-- 批量插入记录 -->
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="id" parameterType="list">
+		INSERT INTO <include refid="table" /> (
+        	CREATE_TIME,
+        	VERSION,
+        	MODIFY_TIME,
+        	MCH_NO,
+        	ADDRESS,
+        	URL,
+        	ICP,
+        	TELEPHONE,
+        	BUSS_MOBILE_NO,
+        	BUSS_CONTACT_EMAIL
+        ) VALUES 
+			<foreach collection="list" item="item" separator=",">
+			(
+			#{item.createTime,jdbcType=TIMESTAMP},
+			0,
+			#{item.modifyTime,jdbcType=TIMESTAMP},
+			#{item.mchNo,jdbcType=VARCHAR},
+			#{item.address,jdbcType=VARCHAR},
+			#{item.url,jdbcType=VARCHAR},
+			#{item.icp,jdbcType=VARCHAR},
+			#{item.telephone,jdbcType=VARCHAR},
+			#{item.bussMobileNo,jdbcType=VARCHAR},
+			#{item.bussContactEmail,jdbcType=VARCHAR}
+			)
+			</foreach>
+	</insert>
+
+	<!-- 更新 -->
+	<update id="update" parameterType="MerchantDetail">
+        UPDATE <include refid="table" />
+		<set>
+			CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+			VERSION = #{version,jdbcType=INTEGER} + 1,
+			MODIFY_TIME = #{modifyTime,jdbcType=TIMESTAMP},
+			MCH_NO = #{mchNo,jdbcType=VARCHAR},
+			ADDRESS = #{address,jdbcType=VARCHAR},
+			URL = #{url,jdbcType=VARCHAR},
+			ICP = #{icp,jdbcType=VARCHAR},
+			TELEPHONE = #{telephone,jdbcType=VARCHAR},
+			BUSS_MOBILE_NO = #{bussMobileNo,jdbcType=VARCHAR},
+			BUSS_CONTACT_EMAIL = #{bussContactEmail,jdbcType=VARCHAR}
+		</set>
+        WHERE ID = #{id,jdbcType=BIGINT} and VERSION = #{version,jdbcType=INTEGER}
+	</update>
+
+	<!-- 只更新不为null的属性 -->
+	<update id="updateIfNotNull" parameterType="MerchantDetail">
+		UPDATE <include refid="table" />
+		<set>
+			<if test="createTime != null">
+				CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			VERSION = #{version,jdbcType=INTEGER} + 1,
+			<if test="modifyTime != null">
+				MODIFY_TIME = #{modifyTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="mchNo != null">
+				MCH_NO = #{mchNo,jdbcType=VARCHAR},
+			</if>
+			<if test="address != null">
+				ADDRESS = #{address,jdbcType=VARCHAR},
+			</if>
+			<if test="url != null">
+				URL = #{url,jdbcType=VARCHAR},
+			</if>
+			<if test="icp != null">
+				ICP = #{icp,jdbcType=VARCHAR},
+			</if>
+			<if test="telephone != null">
+				TELEPHONE = #{telephone,jdbcType=VARCHAR},
+			</if>
+			<if test="bussMobileNo != null">
+				BUSS_MOBILE_NO = #{bussMobileNo,jdbcType=VARCHAR},
+			</if>
+			<if test="bussContactEmail != null">
+				BUSS_CONTACT_EMAIL = #{bussContactEmail,jdbcType=VARCHAR}
+			</if>
+		</set>
+		WHERE ID = #{id,jdbcType=BIGINT} and VERSION = #{version,jdbcType=INTEGER}
+	</update>
+	
+	<!-- 多条件组合查询 -->
+	<select id="listBy" parameterType="java.util.Map" resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+		<choose>
+			<when test="sortColumns != null and sortColumns !='' ">
+				<![CDATA[ ORDER BY ${sortColumns} ]]>
+			</when>
+			<otherwise>
+				<![CDATA[ ORDER BY ID DESC ]]>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 根据多条件组合查询，计算总记录数 -->
+	<select id="countBy" parameterType="java.util.Map" resultType="long">
+		SELECT count(ID) FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+
+	<!-- 按查询条件删除 -->
+	<delete id="deleteBy">
+        DELETE FROM <include refid="table" /> 
+		<where>
+			<include refid="condition_sql" />
+		</where>
+    </delete>
+
+	<!-- 根据多个id查询 -->
+    <select id="listByIdList" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		WHERE ID IN 
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</select>
+
+	<!-- 根据id查询 -->
+    <select id="getById" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" /> 
+		WHERE ID = #{id,jdbcType=BIGINT}  
+	</select>
+
+	<!-- 按id主键删除 -->
+	<delete id="deleteById">
+        DELETE FROM <include refid="table" /> WHERE ID = #{id,jdbcType=BIGINT}
+    </delete>
+
+	<!-- 按多个id主键删除 -->
+	<delete id="deleteByIdList" parameterType="list">
+		DELETE FROM <include refid="table" />
+		WHERE ID IN 
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</delete>
+
+	<!-- ↑↑↑↑↑↑ 如果有新增字段、删除字段、修改字段 以上内容可用模板生成新内容后直接替换 ↑↑↑↑↑↑ -->
+	<!-- ↓↓↓↓↓↓ 以下内容是根据需求手动添加或修改的，请勿使用模板内容直接覆盖 ↓↓↓↓↓↓ -->
+
+	<sql id="condition_sql">
+		<if test="id != null ">
+			AND ID = #{id,jdbcType=BIGINT}
+		</if>
+		<if test="mchNo != null and mchNo !='' ">
+			AND MCH_NO = #{mchNo,jdbcType=VARCHAR}
+		</if>
+	</sql>
+</mapper>
+

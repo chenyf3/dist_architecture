@@ -1,0 +1,7 @@
+# Application Listeners
+org.springframework.context.ApplicationListener=\
+com.xpay.starter.logging.listener.CustomLoggingApplicationListener
+
+# Environment Post Processors
+org.springframework.boot.env.EnvironmentPostProcessor=\
+com.xpay.starter.logging.processor.LoggingEnvironmentPostProcessor

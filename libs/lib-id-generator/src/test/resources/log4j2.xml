@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="info">
+    <!-- 自定义变量 START-->
+    <Properties>
+        <!-- 配置日志文件输出目录 -->
+        <Property name="LOG_HOME">d:/log/</Property>
+        <!-- 日志文件名 -->
+        <property name="LOG_NAME">id-generator-stable-test.log</property>
+    </Properties>
+    <!-- 自定义变量 END-->
+
+    <appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %c{1}[%M %L] %msg%xEx%n"/>
+        </Console>
+
+        <!-- 应用日志输出器 ，并配置日志压缩格式(应用名.log.年-月-日.gz) -->
+        <RollingRandomAccessFile name="stableTestFileAppender"
+                                 immediateFlush="true" fileName="${LOG_HOME}/${LOG_NAME}"
+                                 filePattern="${LOG_HOME}/${LOG_NAME}.%d{yyyy-MM-dd}.log.gz">
+            <!--
+                %d{yyyy-MM-dd HH:mm:ss, SSS} : 日志生产时间
+                %p : 日志输出格式
+                %c : logger的名称
+                %m : 日志内容，即 logger.info("common")
+                %n : 换行符
+                %C : Java类名
+                %L : 日志输出所在行数
+                %M : 日志输出所在方法名
+                hostName : 本地机器名
+                hostAddress : 本地ip地址
+             -->
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %msg%xEx%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+            </Policies>
+        </RollingRandomAccessFile>
+    </appenders>
+
+    <loggers>
+        <root level="info">
+            <appender-ref ref="Console"/>
+        </root>
+
+        <Logger name="com.xpay.middleware.id.testGetIdStable" additivity="true">
+            <AppenderRef ref="stableTestFileAppender" level="INFO" />
+        </Logger>
+    </loggers>
+</configuration>

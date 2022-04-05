@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>common-parent</artifactId>
+        <groupId>com.xpay</groupId>
+        <version>1.0-Release</version>
+    </parent>
+
+    <artifactId>service-extend</artifactId>
+    <description>拓展服务，放一些不好归类的逻辑，如：和运维平台对接等</description>
+
+    <properties>
+        <jenkins-rest.version>0.0.29</jenkins-rest.version>
+    </properties>
+
+    <build>
+        <finalName>${appName}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency> <!-- 单独声明，解决包冲突 -->
+                <groupId>com.aliyun</groupId>
+                <artifactId>aliyun-java-sdk-core</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+            <dependency> <!-- 单独声明，解决包冲突 -->
+                <groupId>com.aliyun</groupId>
+                <artifactId>tea</artifactId>
+                <version>[1.1.14, 2.0.0)</version>
+            </dependency>
+            <dependency> <!-- 单独声明，解决包冲突 -->
+                <groupId>com.google.inject</groupId>
+                <artifactId>guice</artifactId>
+                <version>4.2.3</version>
+            </dependency>
+            <dependency> <!-- 单独声明，解决包冲突 -->
+                <groupId>com.google.inject.extensions</groupId>
+                <artifactId>guice-assistedinject</artifactId>
+                <version>4.2.3</version>
+            </dependency>
+            <dependency> <!-- 单独声明，解决包冲突 -->
+                <groupId>com.google.inject.extensions</groupId>
+                <artifactId>guice-assistedinject</artifactId>
+                <version>4.2.3</version>
+            </dependency>
+            <dependency> <!-- 单独声明，解决包冲突 -->
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-core</artifactId>
+                <version>2.3.0.1</version>
+            </dependency>
+            <dependency> <!-- 单独声明，解决包冲突 -->
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-impl</artifactId>
+                <version>2.3.2</version>
+            </dependency>
+            <dependency> <!-- 单独声明，解决包冲突 -->
+                <groupId>org.jacoco</groupId>
+                <artifactId>org.jacoco.agent</artifactId>
+                <version>0.8.4</version>
+                <classifier>runtime</classifier>
+            </dependency>
+            <dependency> <!-- 单独声明，解决包冲突 -->
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_annotations</artifactId>
+                <version>2.5.1</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency> <!-- 把nacos作为配置中心时需要引入的依赖 -->
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.cdancy</groupId>
+            <artifactId>jenkins-rest</artifactId>
+            <version>${jenkins-rest.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-core</artifactId>
+            <version>4.3.2</version>
+        </dependency>
+        <dependency> <!-- 阿里云dns的sdk -->
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-alidns</artifactId>
+            <version>2.0.10</version>
+        </dependency>
+        <dependency> <!-- 阿里云CDN的sdk -->
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-cdn</artifactId>
+            <version>3.6.4</version>
+        </dependency>
+        <dependency> <!-- 阿里云DCDN的sdk -->
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-dcdn</artifactId>
+            <version>2.1.5</version>
+        </dependency>
+        <dependency> <!-- 阿里云waf的sdk -->
+            <groupId>com.aliyun</groupId>
+            <artifactId>waf_openapi20190910</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <!-- 更多阿里云SDK请查看：https://develop.aliyun.com/tools/sdk?java#/java 和 https://github.com/aliyun/aliyun-openapi-java-sdk -->
+
+        <!-- redis -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.lettuce</groupId>
+            <artifactId>lettuce-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+        </dependency>
+        <!-- redis -->
+
+        <!-- redis lock -->
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+        </dependency>
+        <!-- redis lock -->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.xpay</groupId>
+            <artifactId>common-util</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.xpay</groupId>
+            <artifactId>common-service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.xpay</groupId>
+            <artifactId>starter-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.xpay</groupId>
+            <artifactId>facade-extend</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+</project>

@@ -1,0 +1,4 @@
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.xpay.web.api.common.config.WebApiAutoConfiguration,\
+com.xpay.web.api.common.config.SentinelAutoConfiguration

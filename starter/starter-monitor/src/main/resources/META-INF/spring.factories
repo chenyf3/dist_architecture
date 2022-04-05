@@ -1,0 +1,6 @@
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.xpay.starter.monitor.config.PrometheusAutoConfiguration
+
+org.springframework.boot.actuate.autoconfigure.web.ManagementContextConfiguration=\
+com.xpay.starter.monitor.config.SecurityManagementContextConfiguration
