@@ -145,6 +145,23 @@
             <scope>test</scope>
         </dependency>
 
+<!--        <dependency> &lt;!&ndash; redis 基础包，RedisClient实例会与此共用 RedisConnectionFactory &ndash;&gt;-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-data-redis</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency> &lt;!&ndash; 使用lettuce作为redis的客户端时引入，lettuce/jedis/redisson 三选一即可 &ndash;&gt;-->
+<!--            <groupId>io.lettuce</groupId>-->
+<!--            <artifactId>lettuce-core</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency> &lt;!&ndash; 使用lettuce作为spring-data-redis的客户端实现类且有用到连接池时引入 &ndash;&gt;-->
+<!--            <groupId>org.apache.commons</groupId>-->
+<!--            <artifactId>commons-pool2</artifactId>-->
+<!--        </dependency>-->
+        <dependency><!-- 需要用到 RedisLock 分布式锁时引入 -->
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.xpay</groupId>
             <artifactId>common-statics</artifactId>

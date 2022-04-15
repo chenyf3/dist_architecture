@@ -8,14 +8,14 @@ import com.xpay.common.statics.result.RestResult;
 import com.xpay.common.utils.BeanUtil;
 import com.xpay.common.utils.JsonUtil;
 import com.xpay.common.utils.StringUtil;
-import com.xpay.facade.message.dto.MailReceiverDto;
+import com.xpay.facade.message.dto.MailGroupDto;
 import com.xpay.facade.message.service.EmailFacade;
 import com.xpay.facade.message.service.EmailManageFacade;
 import com.xpay.web.api.common.annotations.CurrentUser;
 import com.xpay.web.api.common.model.UserModel;
 import com.xpay.web.pms.web.controller.BaseController;
 import com.xpay.web.pms.web.vo.devops.MailQueryVo;
-import com.xpay.web.pms.web.vo.devops.MailReceiverVo;
+import com.xpay.web.pms.web.vo.devops.MailGroupVo;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,72 +34,71 @@ public class MailController extends BaseController {
     @DubboReference
     EmailFacade emailFacade;
 
-    @Permission("baseConfig:mailReceive:list")
-    @RequestMapping("listMailReceiver")
-    public RestResult<PageResult<List<MailReceiverDto>>> listMailReceiver(@RequestBody MailQueryVo queryVo){
+    @Permission("baseConfig:mailGroup:list")
+    @RequestMapping("listMailGroup")
+    public RestResult<PageResult<List<MailGroupDto>>> listMailGroup(@RequestBody MailQueryVo queryVo){
         PageQuery pageQuery = PageQuery.newInstance(queryVo.getCurrentPage(), queryVo.getPageSize());
         pageQuery.setIsNeedTotalRecord(true);
 
         Map<String, Object> paramMap = BeanUtil.toMapNotNull(queryVo);
-        PageResult<List<MailReceiverDto>> pageResult = emailManageFacade.listMailReceiverPage(paramMap, pageQuery);
+        PageResult<List<MailGroupDto>> pageResult = emailManageFacade.listMailGroupPage(paramMap, pageQuery);
+        if (pageResult.getData() != null && pageResult.getData().size() > 0) {
+            pageResult.getData().forEach(group -> {
+                if(StringUtil.isNotEmpty(group.getReceivers())){
+                    List<String> receivers = JsonUtil.toList(group.getReceivers(), String.class);
+                    group.setReceivers(StringUtil.commaToNewline(String.join(",", receivers)));
+                }
+                if(StringUtil.isNotEmpty(group.getCc())){
+                    List<String> cc = JsonUtil.toList(group.getCc(), String.class);
+                    group.setCc(StringUtil.commaToNewline(String.join(",", cc)));
+                }
+            });
+        }
         return RestResult.success(pageResult);
     }
 
-    @Permission("baseConfig:mailReceive:manage")
+    @Permission("baseConfig:mailGroup:manage")
     @RequestMapping("getMailSender")
     public RestResult getMailSender(){
         Map<String, String> map = emailFacade.getMailSender();
         return RestResult.success(map);
     }
 
-    @Permission("baseConfig:mailReceive:manage")
-    @RequestMapping("addMailReceiver")
-    public RestResult<String> addMailReceiver(@RequestBody MailReceiverVo receiverVo){
-        if(StringUtil.isNotEmpty(receiverVo.getReceivers())){
-            receiverVo.setReceivers(receiverVo.getReceivers().trim().replace("&quot;", "\""));
-        }
+    @Permission("baseConfig:mailGroup:manage")
+    @RequestMapping("addMailGroup")
+    public RestResult<String> addMailGroup(@RequestBody MailGroupVo mailGroupVo){
+        mailGroupVo.setReceivers(StringUtil.newlineToComma(mailGroupVo.getReceivers()));
+        mailGroupVo.setCc(StringUtil.newlineToComma(mailGroupVo.getCc()));
 
-        try{
-            JsonUtil.toList(receiverVo.getReceivers(), String.class);
-        }catch(Exception e){
-            return RestResult.error("收件人格式不正确！");
-        }
+        MailGroupDto mailGroup = BeanUtil.newAndCopy(mailGroupVo, MailGroupDto.class);
 
-        MailReceiverDto mailReceiver = BeanUtil.newAndCopy(receiverVo, MailReceiverDto.class);
-
-        try{
-            emailManageFacade.addMailReceiver(mailReceiver);
+        try {
+            emailManageFacade.addMailGroup(mailGroup);
             return RestResult.success("添加成功");
-        }catch(BizException e){
+        } catch(BizException e) {
             return RestResult.error("添加失败，" + e.getMsg());
         }
     }
 
-    @Permission("baseConfig:mailReceive:manage")
-    @RequestMapping("editMailReceiver")
-    public RestResult<String> editMailReceiver(@RequestBody MailReceiverVo receiverVo){
-        if(StringUtil.isNotEmpty(receiverVo.getReceivers())){
-            receiverVo.setReceivers(receiverVo.getReceivers().trim().replace("&quot;", "\""));
-        }
-
-        try{
-            JsonUtil.toList(receiverVo.getReceivers(), String.class);
-        }catch(Exception e){
-            return RestResult.error("收件人格式不正确！");
-        }
+    @Permission("baseConfig:mailGroup:manage")
+    @RequestMapping("editMailGroup")
+    public RestResult<String> editMailGroup(@RequestBody MailGroupVo mailGroupVo){
+        mailGroupVo.setReceivers(StringUtil.newlineToComma(mailGroupVo.getReceivers()));
+        mailGroupVo.setCc(StringUtil.newlineToComma(mailGroupVo.getCc()));
 
         try {
-            emailManageFacade.editMailReceiver(receiverVo.getId(), receiverVo.getSender(), receiverVo.getReceivers(), receiverVo.getRemark());
+            MailGroupDto mailGroupDto = BeanUtil.newAndCopy(mailGroupVo, MailGroupDto.class);
+            emailManageFacade.editMailGroup(mailGroupDto);
             return RestResult.success("修改成功");
         } catch(BizException e) {
             return RestResult.error(e.getMsg());
         }
     }
 
-    @Permission("baseConfig:mailReceive:manage")
-    @RequestMapping("deleteMailReceiver")
-    public RestResult<String> deleteMailReceiver(@RequestParam Long recordId, @CurrentUser UserModel userModel){
-        boolean isOk = emailManageFacade.deleteMailReceiver(recordId, userModel.getLoginName());
+    @Permission("baseConfig:mailGroup:manage")
+    @RequestMapping("deleteMailGroup")
+    public RestResult<String> deleteMailGroup(@RequestParam Long recordId, @CurrentUser UserModel userModel){
+        boolean isOk = emailManageFacade.deleteMailGroup(recordId, userModel.getLoginName());
         return isOk ? RestResult.success("删除成功") : RestResult.error("删除失败");
     }
 }

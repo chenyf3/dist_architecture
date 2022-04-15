@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.xpay.service.message.entity.MailDelayRecord">
+	<sql id="table"> tbl_mail_delay_record </sql>
+
+	<!-- 用于返回的bean对象 -->
+	<resultMap id="BaseResultMap" type="com.xpay.service.message.entity.MailDelayRecord">
+		<result column="ID" property="id" jdbcType="BIGINT"/>
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="CREATE_DATE" property="createDate" jdbcType="DATE"/>
+		<result column="VERSION" property="version" jdbcType="SMALLINT"/>
+		<result column="GROUP_KEY" property="groupKey" jdbcType="VARCHAR"/>
+		<result column="SUBJECT" property="subject" jdbcType="VARCHAR"/>
+		<result column="CONTENT" property="content" jdbcType="LONGVARCHAR"/>
+		<result column="TRX_NO" property="trxNo" jdbcType="VARCHAR"/>
+		<result column="STATUS" property="status" jdbcType="TINYINT"/>
+		<result column="SEND_START_TIME" property="sendStartTime" jdbcType="TIMESTAMP"/>
+		<result column="SEND_FINISH_TIME" property="sendFinishTime" jdbcType="TIMESTAMP"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="Base_Column_List">
+		ID,
+		CREATE_TIME,
+		CREATE_DATE,
+		VERSION,
+		GROUP_KEY,
+		SUBJECT,
+		CONTENT,
+		TRX_NO,
+		STATUS,
+		SEND_START_TIME,
+		SEND_FINISH_TIME
+	</sql>
+
+	<!-- 插入记录 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="MailDelayRecord">
+		INSERT INTO <include refid="table" /> (
+        	CREATE_TIME,
+        	CREATE_DATE,
+        	VERSION,
+        	GROUP_KEY,
+        	SUBJECT,
+        	CONTENT,
+        	TRX_NO,
+        	STATUS,
+        	SEND_START_TIME,
+        	SEND_FINISH_TIME
+        ) VALUES (
+			#{createTime,jdbcType=TIMESTAMP},
+			#{createDate,jdbcType=DATE},
+			0,
+			#{groupKey,jdbcType=VARCHAR},
+			#{subject,jdbcType=VARCHAR},
+			#{content,jdbcType=LONGVARCHAR},
+			#{trxNo,jdbcType=VARCHAR},
+			#{status,jdbcType=TINYINT},
+			#{sendStartTime,jdbcType=TIMESTAMP},
+			#{sendFinishTime,jdbcType=TIMESTAMP}
+        )
+	</insert>
+
+	<!-- 批量插入记录 -->
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="id" parameterType="list">
+		INSERT INTO <include refid="table" /> (
+        	CREATE_TIME,
+        	CREATE_DATE,
+        	VERSION,
+        	GROUP_KEY,
+        	SUBJECT,
+        	CONTENT,
+        	TRX_NO,
+        	STATUS,
+        	SEND_START_TIME,
+        	SEND_FINISH_TIME
+        ) VALUES 
+			<foreach collection="list" item="item" separator=",">
+			(
+			#{item.createTime,jdbcType=TIMESTAMP},
+			#{item.createDate,jdbcType=DATE},
+			0,
+			#{item.groupKey,jdbcType=VARCHAR},
+			#{item.subject,jdbcType=VARCHAR},
+			#{item.content,jdbcType=LONGVARCHAR},
+			#{item.trxNo,jdbcType=VARCHAR},
+			#{item.status,jdbcType=TINYINT},
+			#{item.sendStartTime,jdbcType=TIMESTAMP},
+			#{item.sendFinishTime,jdbcType=TIMESTAMP}
+			)
+			</foreach>
+	</insert>
+
+	<!-- 更新 -->
+	<update id="update" parameterType="MailDelayRecord">
+        UPDATE <include refid="table" />
+		<set>
+			CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+			CREATE_DATE = #{createDate,jdbcType=DATE},
+			VERSION = #{version,jdbcType=SMALLINT} + 1,
+			GROUP_KEY = #{groupKey,jdbcType=VARCHAR},
+			SUBJECT = #{subject,jdbcType=VARCHAR},
+			CONTENT = #{content,jdbcType=LONGVARCHAR},
+			TRX_NO = #{trxNo,jdbcType=VARCHAR},
+			STATUS = #{status,jdbcType=TINYINT},
+			SEND_START_TIME = #{sendStartTime,jdbcType=TIMESTAMP},
+			SEND_FINISH_TIME = #{sendFinishTime,jdbcType=TIMESTAMP}
+		</set>
+        WHERE ID = #{id,jdbcType=BIGINT} and VERSION = #{version,jdbcType=SMALLINT}
+	</update>
+
+	<!-- 只更新不为null的属性 -->
+	<update id="updateIfNotNull" parameterType="MailDelayRecord">
+		UPDATE <include refid="table" />
+		<set>
+			<if test="createTime != null">
+				CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createDate != null">
+				CREATE_DATE = #{createDate,jdbcType=DATE},
+			</if>
+			VERSION = #{version,jdbcType=SMALLINT} + 1,
+			<if test="groupKey != null">
+				GROUP_KEY = #{groupKey,jdbcType=VARCHAR},
+			</if>
+			<if test="subject != null">
+				SUBJECT = #{subject,jdbcType=VARCHAR},
+			</if>
+			<if test="content != null">
+				CONTENT = #{content,jdbcType=LONGVARCHAR},
+			</if>
+			<if test="trxNo != null">
+				TRX_NO = #{trxNo,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null">
+				STATUS = #{status,jdbcType=TINYINT},
+			</if>
+			<if test="sendStartTime != null">
+				SEND_START_TIME = #{sendStartTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="sendFinishTime != null">
+				SEND_FINISH_TIME = #{sendFinishTime,jdbcType=TIMESTAMP}
+			</if>
+		</set>
+		WHERE ID = #{id,jdbcType=BIGINT} and VERSION = #{version,jdbcType=SMALLINT}
+	</update>
+	
+	<!-- 多条件组合查询 -->
+	<select id="listBy" parameterType="java.util.Map" resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+		<choose>
+			<when test="sortColumns != null and sortColumns !='' ">
+				<![CDATA[ ORDER BY ${sortColumns} ]]>
+			</when>
+			<otherwise>
+				<![CDATA[ ORDER BY ID DESC ]]>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 根据多条件组合查询，计算总记录数 -->
+	<select id="countBy" parameterType="java.util.Map" resultType="long">
+		SELECT count(ID) FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+
+	<!-- 按查询条件删除 -->
+	<delete id="deleteBy">
+        DELETE FROM <include refid="table" /> 
+		<where>
+			<include refid="condition_sql" />
+		</where>
+    </delete>
+
+	<!-- 根据多个id查询 -->
+    <select id="listByIdList" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		WHERE ID IN 
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</select>
+
+	<!-- 根据id查询 -->
+    <select id="getById" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" /> 
+		WHERE ID = #{id,jdbcType=BIGINT}  
+	</select>
+
+	<!-- 按id主键删除 -->
+	<delete id="deleteById">
+        DELETE FROM <include refid="table" /> WHERE ID = #{id,jdbcType=BIGINT}
+    </delete>
+
+	<!-- 按多个id主键删除 -->
+	<delete id="deleteByIdList" parameterType="list">
+		DELETE FROM <include refid="table" />
+		WHERE ID IN 
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</delete>
+
+	<!-- ↑↑↑↑↑↑ 如果有新增字段、删除字段、修改字段 以上内容可用模板生成新内容后直接替换 ↑↑↑↑↑↑ -->
+	<!-- ↓↓↓↓↓↓ 以下内容是根据需求手动添加或修改的，请勿使用模板内容直接覆盖 ↓↓↓↓↓↓ -->
+
+	<sql id="condition_sql">
+		<if test="id != null ">
+			AND ID = #{id,jdbcType=BIGINT}
+		</if>
+		<if test="idList != null and idList.size() > 0">
+			AND ID IN <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+		</if>
+		<if test="createTime != null ">
+			AND CREATE_TIME = #{createTime,jdbcType=TIMESTAMP}
+		</if>
+		<if test="createDate != null ">
+			AND CREATE_DATE = #{createDate,jdbcType=DATE}
+		</if>
+		<if test="version != null ">
+			AND VERSION = #{version,jdbcType=SMALLINT}
+		</if>
+		<if test="groupKey != null and groupKey !='' ">
+			AND GROUP_KEY = #{groupKey,jdbcType=VARCHAR}
+		</if>
+		<if test="subject != null and subject !='' ">
+			AND SUBJECT = #{subject,jdbcType=VARCHAR}
+		</if>
+		<if test="content != null and content !='' ">
+			AND CONTENT = #{content,jdbcType=LONGVARCHAR}
+		</if>
+		<if test="trxNo != null and trxNo !='' ">
+			AND TRX_NO = #{trxNo,jdbcType=VARCHAR}
+		</if>
+		<if test="status != null ">
+			AND STATUS = #{status,jdbcType=TINYINT}
+		</if>
+		<if test="sendStartTime != null ">
+			AND SEND_START_TIME = #{sendStartTime,jdbcType=TIMESTAMP}
+		</if>
+		<if test="sendFinishTime != null ">
+			AND SEND_FINISH_TIME = #{sendFinishTime,jdbcType=TIMESTAMP}
+		</if>
+	</sql>
+
+
+	<select id="listPendingRecord" parameterType="java.util.Map" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		<where>
+			CREATE_DATE IN <foreach collection="createDateList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=DATE}</foreach>
+			AND STATUS = 1
+			AND CREATE_TIME &lt;= #{createTimeEnd,jdbcType=TIMESTAMP}
+		</where>
+	</select>
+	<select id="listSendingOvertimeRecord" parameterType="java.util.Map" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		<where>
+			CREATE_DATE IN <foreach collection="createDateList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=DATE}</foreach>
+			AND STATUS = 2
+			AND SEND_START_TIME IS NOT NULL AND SEND_START_TIME &lt;= #{sendStartTimeEnd,jdbcType=TIMESTAMP}
+		</where>
+	</select>
+	<select id="listFinishOvertimeRecord" parameterType="java.util.Map" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		<where>
+			CREATE_DATE &lt;= #{createDateEnd,jdbcType=DATE} AND STATUS = 3
+		</where>
+	</select>
+	<update id="updatePendingToSending" parameterType="java.util.Map">
+		UPDATE <include refid="table" />
+		<set>
+			STATUS = 2,
+			VERSION = VERSION + 1,
+			SEND_START_TIME =#{sendStartTime,jdbcType=TIMESTAMP}
+		</set>
+		WHERE ID IN <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+		AND STATUS = 1
+	</update>
+	<update id="revertSendingToPending" parameterType="java.util.Map">
+		UPDATE <include refid="table" />
+		<set>
+			STATUS = 1,
+			VERSION = VERSION + 1,
+			SEND_START_TIME = null
+		</set>
+		WHERE ID IN <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+		AND STATUS = 2
+	</update>
+	<update id="updateSendingToFinish" parameterType="java.util.Map">
+		UPDATE <include refid="table" />
+		<set>
+			STATUS = 3,
+			VERSION = VERSION + 1,
+			SEND_FINISH_TIME =#{sendFinishTime,jdbcType=TIMESTAMP}
+		</set>
+		WHERE ID IN <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+		AND STATUS = 2
+	</update>
+</mapper>
+

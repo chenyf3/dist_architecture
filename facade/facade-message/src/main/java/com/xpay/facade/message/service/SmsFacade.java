@@ -23,11 +23,18 @@ public interface SmsFacade {
     public SmsRespDto sendCode(String phone, String code, String tplName, String signName, String trxNo);
 
     /**
-     * 短信发送接口
+     * 短信发送接口（同步发送）
      * @param smsParam
      * @return
      */
     public SmsRespDto send(SmsSendDto smsParam);
+
+    /**
+     * 短信发送接口（异步发送）
+     * @param smsParam
+     * @return
+     */
+    public boolean sendAsync(SmsSendDto smsParam);
 
     /**
      * 查询短信发送结果

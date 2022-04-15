@@ -11,6 +11,36 @@ public class StringUtil {
     public final static String NORMAL_LETTER_REGEX = "^[a-zA-Z][a-zA-Z0-9_-]*$";//只允许英文字母开头，第2位以后允许字母、数字、下划线、中划线
 
     /**
+     * 把换行符替换成逗号
+     * @param str
+     * @return
+     */
+    public static String newlineToComma(String str){
+        if(str == null) return null;
+        return str.trim().replace("\n", ",");
+    }
+
+    /**
+     * 把逗号替换成换行符
+     * @param str
+     * @return
+     */
+    public static String commaToNewline(String str){
+        if(str == null) return null;
+        return str.trim().replace(",", "\n");
+    }
+
+    /**
+     * 把使用逗号分割的字符串转换成数组
+     * @param str
+     * @return
+     */
+    public static String[] commaToArray(String str){
+        if(str == null) return null;
+        return str.split(",");
+    }
+
+    /**
      * 判断是否只包含常规字符，即：只允许英文字母开头，第2位以后允许字母、数字、下划线、中划线
      * @param content
      * @return

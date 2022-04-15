@@ -1,10 +1,16 @@
 package com.xpay.service.message.listener;
 
 import com.xpay.common.statics.constants.mqdest.TopicDest;
+import com.xpay.common.utils.BeanUtil;
 import com.xpay.common.utils.JsonUtil;
+import com.xpay.common.utils.StringUtil;
 import com.xpay.facade.message.dto.EmailMsgDto;
+import com.xpay.facade.message.dto.EmailSendDto;
+import com.xpay.facade.message.dto.SmsMsgDto;
+import com.xpay.facade.message.dto.SmsSendDto;
 import com.xpay.service.message.biz.email.EmailBiz;
 import com.xpay.service.message.biz.mq.AmqTraceBiz;
+import com.xpay.service.message.biz.sms.SmsBiz;
 import com.xpay.starter.amq.config.Const;
 import com.xpay.starter.amq.tracer.TraceMsg;
 import org.slf4j.Logger;
@@ -19,16 +25,34 @@ public class AMQListener {
     @Autowired
     EmailBiz emailBiz;
     @Autowired
+    SmsBiz smsBiz;
+    @Autowired
     AmqTraceBiz amqTraceBiz;
 
     /**
-     * 异步发送邮件的消息消费端
+     * 异步发送邮件
      * @param message
      */
-    @JmsListener(destination = TopicDest.EMAIL_SEND_ASYNC, subscription = "emailAsyncConsume")
+    @JmsListener(destination = TopicDest.EMAIL_SEND_ASYNC, subscription = "emailAsyncConsume", concurrency = "1-5")
     public void emailAsyncConsume(String message) {
         EmailMsgDto msgDto = JsonUtil.toBean(message, EmailMsgDto.class);
-        emailBiz.send(msgDto);
+        String from = msgDto.getFrom();
+        String[] to = msgDto.getTo().split(",");
+        String[] cc = msgDto.getCc();
+        String subject = msgDto.getSubject();
+        String content = msgDto.getContent();
+        emailBiz.send(from, to, cc, subject, content);
+    }
+
+    /**
+     * 异步发送短信
+     * @param message
+     */
+    @JmsListener(destination = TopicDest.SMS_SEND_ASYNC, subscription = "smsAsyncConsume", concurrency = "1-5")
+    public void smsAsyncConsume(String message) {
+        SmsMsgDto msgDto = JsonUtil.toBean(message, SmsMsgDto.class);
+        SmsSendDto smsParam = BeanUtil.newAndCopy(msgDto, SmsSendDto.class);
+        smsBiz.send(smsParam);
     }
 
     /**

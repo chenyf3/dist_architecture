@@ -3,6 +3,7 @@ package com.xpay.service.message.serviceImpl;
 import com.xpay.facade.message.dto.EmailSendDto;
 import com.xpay.facade.message.service.EmailFacade;
 import com.xpay.service.message.biz.email.EmailBiz;
+import com.xpay.service.message.biz.email.EmailMergeSendTask;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -12,25 +13,37 @@ import java.util.Map;
 public class EmailFacadeImpl implements EmailFacade {
     @Autowired
     EmailBiz emailBiz;
+    @Autowired
+    EmailMergeSendTask emailMergeSendBiz;
 
+    @Override
     public Map<String, String> getMailSender(){
         return emailBiz.getMailSender();
     }
 
+    @Override
     public boolean send(String groupKey, String subject, String content){
         return emailBiz.send(groupKey, subject, content);
     }
 
+    @Override
     public boolean sendAsync(String groupKey, String subject, String content){
         return emailBiz.sendAsync(groupKey, subject, content);
     }
 
+    @Override
     public boolean sendHtml(String groupKey, String subject, String content){
         return emailBiz.sendHtml(groupKey,subject, content);
     }
 
+    @Override
     public boolean sendHtmlAsync(String groupKey, String subject, String content){
         return emailBiz.sendHtmlAsync(groupKey, subject, content);
+    }
+
+    @Override
+    public boolean sendHtmlMerge(String groupKey, String subject, String content, String trxNo){
+        return emailBiz.sendHtmlMerge(groupKey, subject, content, trxNo);
     }
 
     @Override
@@ -39,7 +52,17 @@ public class EmailFacadeImpl implements EmailFacade {
     }
 
     @Override
+    public boolean send(String from, String[] to, String[] cc, String subject, String content) {
+        return emailBiz.send(from, to, cc, subject, content);
+    }
+
+    @Override
     public boolean sendHtml(String from, String to, String[] cc, String subject, String content){
+        return emailBiz.sendHtml(from, to, cc, subject, content);
+    }
+
+    @Override
+    public boolean sendHtml(String from, String[] to, String[] cc, String subject, String content){
         return emailBiz.sendHtml(from, to, cc, subject, content);
     }
 

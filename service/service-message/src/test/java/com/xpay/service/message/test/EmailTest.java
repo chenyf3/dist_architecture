@@ -3,10 +3,10 @@ package com.xpay.service.message.test;
 import com.xpay.common.statics.constants.message.EmailSend;
 import com.xpay.facade.message.dto.EmailSendDto;
 import com.xpay.common.utils.JsonUtil;
-import com.xpay.facade.message.dto.MailReceiverDto;
+import com.xpay.facade.message.dto.MailGroupDto;
 import com.xpay.facade.message.service.EmailFacade;
 import com.xpay.facade.message.service.EmailManageFacade;
-import org.apache.dubbo.config.annotation.Reference;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -18,19 +18,19 @@ public class EmailTest extends BaseTestCase {
     private String to = "abc@xxx.com";
     private String[] cc = new String[]{"def@xxx.com"};
 
-    @Reference
+    @DubboReference
     EmailFacade emailFacade;
-    @Reference
+    @DubboReference
     EmailManageFacade messageManageFacade;
 
     @Ignore
     @Test
     public void addMailReceiver(){
-        MailReceiverDto mailReceiver = new MailReceiverDto();
-        mailReceiver.setSender(EmailSend.MCH_NOTIFY);
-        mailReceiver.setGroupKey("TEST_GROUP");
-        mailReceiver.setReceivers(JsonUtil.toJson(Arrays.asList(to)));
-        boolean isOk = messageManageFacade.addMailReceiver(mailReceiver);
+        MailGroupDto mailGroup = new MailGroupDto();
+        mailGroup.setSender(EmailSend.MCH_NOTIFY);
+        mailGroup.setGroupKey("TEST_GROUP");
+        mailGroup.setReceivers(JsonUtil.toJson(Arrays.asList(to)));
+        boolean isOk = messageManageFacade.addMailGroup(mailGroup);
         System.out.println("isOk="+isOk);
     }
 
@@ -90,5 +90,17 @@ public class EmailTest extends BaseTestCase {
         try{
             Thread.sleep(3000);
         }catch(Exception e){e.printStackTrace();}
+    }
+
+    @Ignore
+    @Test
+    public void testMergeDelay(){
+        String groupKey = "SYS_MONITOR_ALERT_GROUP";
+        String subject = "测试合并发送";
+        String content = "合并发送主题邮件";
+        for(int i=0; i<1000; i++){
+            String trxNo = "PL0000000000" + (i+1);
+            emailFacade.sendHtmlMerge(groupKey, subject, content, trxNo);
+        }
     }
 }

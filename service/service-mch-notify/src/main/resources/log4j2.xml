@@ -76,10 +76,11 @@
             <AppenderRef ref="consoleAppender" level="DEBUG" />
             <AppenderRef ref="fileAppender" level="DEBUG" />
         </Logger>
-        <Logger name="com.xpay" additivity="false">
+        <!--  需要打印sql语句时打开，并在application.properties中配置这两项：spring.datasource.druid.filter.slf4j.enabled=true 和 spring.datasource.druid.filter.slf4j.statement-executable-sql-log-enable=true
+        <Logger name="druid.sql.Statement" additivity="false">
             <AppenderRef ref="consoleAppender" level="DEBUG" />
-            <AppenderRef ref="fileAppender" level="INFO" />
         </Logger>
+         -->
     </Loggers>
     <!-- 日志实例 END-->
 </Configuration>

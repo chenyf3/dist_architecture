@@ -31,6 +31,8 @@ public class TopicDest {
     //通用(公用)模块
     @Queue(desc = "异步邮件", group = TopicGroup.COMMON_GROUP)
     public static final String EMAIL_SEND_ASYNC = "common.emailSendAsync";
+    @Queue(desc = "异步短信", group = TopicGroup.COMMON_GROUP)
+    public static final String SMS_SEND_ASYNC = "common.smsSendAsync";
     @Queue(desc = "数据迁移", group = TopicGroup.COMMON_GROUP)
     public static final String DATA_MIGRATION = "common.dataMigration";
     @Queue(desc = "上线发布", group = TopicGroup.COMMON_GROUP)

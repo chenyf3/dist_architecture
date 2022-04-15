@@ -24,17 +24,23 @@ public class EmailClient {
         SENDER_INFO.putAll(senderInfo);
     }
 
-    public boolean sendTextMail(String from, String to, String[] cc, String subject, String content){
-        JavaMailSender sender = getMailSender(from);
-        if(sender == null){
+    public boolean sendTextMail(String from, String[] to, String[] cc, String subject, String content) {
+        JavaMailSender sender;
+        if(from == null || from.trim().length() == 0){
+            throw new RuntimeException("邮件发送者不能为空");
+        }else if ((sender = getMailSender(from)) == null) {
             throw new RuntimeException(from + " 没有此邮件发送者的配置");
-        }else if(Utils.isEmpty(to)){
+        }else if(to == null || to.length == 0){
             throw new RuntimeException("邮件接收者不能为空");
         }
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(from);
-        message.setTo(to);
+        if(to.length == 1){
+            message.setTo(to[0]);
+        }else{
+            message.setTo(to);
+        }
         message.setSubject(subject);
         message.setText(content);
         if(cc != null && cc.length > 0){
@@ -50,11 +56,13 @@ public class EmailClient {
         }
     }
 
-    public boolean sendHtmlMail(String from, String to, String[] cc, String subject, String content) {
-        JavaMailSender sender = getMailSender(from);
-        if (sender == null) {
+    public boolean sendHtmlMail(String from, String[] to, String[] cc, String subject, String content) {
+        JavaMailSender sender;
+        if(from == null || from.trim().length() == 0){
+            throw new RuntimeException("邮件发送者不能为空");
+        }else if ((sender = getMailSender(from)) == null) {
             throw new RuntimeException(from + " 没有此邮件发送者的配置");
-        }else if(Utils.isEmpty(to)){
+        }else if(to == null || to.length == 0){
             throw new RuntimeException("邮件接收者不能为空");
         }
 
@@ -62,7 +70,11 @@ public class EmailClient {
             MimeMessage message = sender.createMimeMessage();
             MimeMessageHelper messageHelper = new MimeMessageHelper(message, true);
             messageHelper.setFrom(from);
-            messageHelper.setTo(to);
+            if(to.length == 1){
+                messageHelper.setTo(to[0]);
+            }else{
+                messageHelper.setTo(to);
+            }
             messageHelper.setSubject(subject);
             messageHelper.setText(content, true);
             if (cc != null && cc.length > 0) {

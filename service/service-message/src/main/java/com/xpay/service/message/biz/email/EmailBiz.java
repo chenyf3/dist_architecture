@@ -8,9 +8,12 @@ import com.xpay.common.utils.JsonUtil;
 import com.xpay.common.utils.RandomUtil;
 import com.xpay.common.utils.StringUtil;
 import com.xpay.facade.message.dto.EmailMsgDto;
+import com.xpay.facade.message.enums.EmailSendStatusEnum;
 import com.xpay.service.message.biz.common.TemplateResolver;
-import com.xpay.service.message.dao.MailReceiverDao;
-import com.xpay.service.message.entity.MailReceiver;
+import com.xpay.service.message.dao.MailGroupDao;
+import com.xpay.service.message.dao.MailDelayRecordDao;
+import com.xpay.service.message.entity.MailGroup;
+import com.xpay.service.message.entity.MailDelayRecord;
 import com.xpay.starter.plugin.client.EmailClient;
 import com.xpay.starter.plugin.plugins.MQSender;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
@@ -18,21 +21,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 @Component
 public class EmailBiz {
-    private final static String TEMPLATE_FOLDER = "email" + File.separator;//邮件模版的路径：classpath:templates/email/
-    @Autowired
-    MailReceiverDao mailReceiverDao;
+    public final static String TEMPLATE_FOLDER = "email" + File.separator;//邮件模版的路径：classpath:templates/email/
 
-    @Autowired
-    EmailClient emailClient;
     @Autowired
     TemplateResolver templateResolver;
     @Autowired
-    MQSender amqSender;
+    EmailClient emailClient;
+    @Autowired
+    MQSender mqSender;
+    @Autowired
+    MailGroupDao mailGroupDao;
+    @Autowired
+    MailDelayRecordDao mailDelayRecordDao;
 
     /**
      * 同步发送邮件
@@ -42,7 +48,7 @@ public class EmailBiz {
      * @return
      */
     public boolean send(String groupKey, String subject, String content){
-        ImmutableTriple<String, String, String[]> sendInfo = getMailSendInfo(groupKey);
+        ImmutableTriple<String, String[], String[]> sendInfo = getMailSendInfo(groupKey);
         return send(sendInfo.getLeft(), sendInfo.getMiddle(), sendInfo.getRight(), subject, content);
     }
 
@@ -54,7 +60,7 @@ public class EmailBiz {
      * @return
      */
     public boolean sendAsync(String groupKey, String subject, String content){
-        ImmutableTriple<String, String, String[]> sendInfo = getMailSendInfo(groupKey);
+        ImmutableTriple<String, String[], String[]> sendInfo = getMailSendInfo(groupKey);
         return sendAsync(sendInfo.getLeft(), sendInfo.getMiddle(), sendInfo.getRight(), subject, content, false);
     }
 
@@ -66,7 +72,7 @@ public class EmailBiz {
      * @return
      */
     public boolean sendHtml(String groupKey, String subject, String content){
-        ImmutableTriple<String, String, String[]> sendInfo = getMailSendInfo(groupKey);
+        ImmutableTriple<String, String[], String[]> sendInfo = getMailSendInfo(groupKey);
         return sendHtml(sendInfo.getLeft(), sendInfo.getMiddle(), sendInfo.getRight(), subject, content);
     }
 
@@ -78,8 +84,39 @@ public class EmailBiz {
      * @return
      */
     public boolean sendHtmlAsync(String groupKey, String subject, String content){
-        ImmutableTriple<String, String, String[]> sendInfo = getMailSendInfo(groupKey);
+        ImmutableTriple<String, String[], String[]> sendInfo = getMailSendInfo(groupKey);
         return sendAsync(sendInfo.getLeft(), sendInfo.getMiddle(), sendInfo.getRight(), subject, content, true);
+    }
+
+    /**
+     * 延迟合并发送邮件，实际发送由 {@link EmailMergeSendTask} 来处理
+     * @param groupKey
+     * @param subject
+     * @param trxNo
+     * @param content
+     * @return
+     */
+    public boolean sendHtmlMerge(String groupKey, String subject, String content, String trxNo){
+        if(StringUtil.isEmpty(groupKey)){
+            throw new BizException("邮件分组不能为空");
+        }
+
+        MailGroup mailGroup = mailGroupDao.getByGroupKey(groupKey);
+        if (mailGroup == null) {
+            throw new BizException("邮件分组配置不存在," + groupKey);
+        }
+
+        MailDelayRecord delayRecord = new MailDelayRecord();
+        delayRecord.setCreateTime(new Date());
+        delayRecord.setCreateDate(delayRecord.getCreateTime());
+        delayRecord.setGroupKey(groupKey);
+        delayRecord.setSubject(subject);
+        delayRecord.setContent(content);
+        delayRecord.setTrxNo(trxNo == null ? "" : trxNo);
+        delayRecord.setContent(content);
+        delayRecord.setStatus(EmailSendStatusEnum.PENDING.getValue());
+        mailDelayRecordDao.insert(delayRecord);
+        return true;
     }
 
     /**
@@ -92,6 +129,20 @@ public class EmailBiz {
      * @return
      */
     public boolean send(String from, String to, String[] cc, String subject, String content){
+        String[] toArr = StringUtil.commaToArray(to);
+        return emailClient.sendTextMail(from, toArr, cc, subject, content);
+    }
+
+    /**
+     * 同步发送文本邮件
+     * @param from
+     * @param to
+     * @param cc
+     * @param subject
+     * @param content
+     * @return
+     */
+    public boolean send(String from, String[] to, String[] cc, String subject, String content){
         return emailClient.sendTextMail(from, to, cc, subject, content);
     }
 
@@ -106,17 +157,32 @@ public class EmailBiz {
      * @return
      */
     public boolean sendAsync(String from, String to, String[] cc, String subject, String content, boolean isHtml){
+        String[] toArr = new String[]{to};
+        return sendAsync(from, toArr, cc, subject, content, isHtml);
+    }
+
+    /**
+     * 异步发送邮件
+     * @param from
+     * @param to
+     * @param cc
+     * @param subject
+     * @param content
+     * @param isHtml
+     * @return
+     */
+    public boolean sendAsync(String from, String[] to, String[] cc, String subject, String content, boolean isHtml){
         EmailMsgDto msgDto = new EmailMsgDto();
         msgDto.setTopic(TopicDest.EMAIL_SEND_ASYNC);
         msgDto.setTags(TopicGroup.COMMON_GROUP);
         msgDto.setTrxNo(RandomUtil.get16LenStr());
         msgDto.setFrom(from);
-        msgDto.setTo(to);
+        msgDto.setTo(String.join(",", to));
         msgDto.setCc(cc);
         msgDto.setSubject(subject);
         msgDto.setContent(content);
         msgDto.setHtmlFormat(isHtml);
-        return amqSender.sendOne(msgDto);
+        return mqSender.sendOne(msgDto);
     }
 
     /**
@@ -129,6 +195,20 @@ public class EmailBiz {
      * @return
      */
     public boolean sendHtml(String from, String to, String[] cc, String subject, String content){
+        String[] toArr = StringUtil.commaToArray(to);
+        return emailClient.sendHtmlMail(from, toArr, cc, subject, content);
+    }
+
+    /**
+     * 同步发送html格式的邮件
+     * @param from
+     * @param to
+     * @param cc
+     * @param subject
+     * @param content
+     * @return
+     */
+    public boolean sendHtml(String from, String[] to, String[] cc, String subject, String content){
         return emailClient.sendHtmlMail(from, to, cc, subject, content);
     }
 
@@ -138,12 +218,13 @@ public class EmailBiz {
      * @return
      */
     public boolean send(EmailSendDto emailParam){
-        String content = templateResolver.resolve(TEMPLATE_FOLDER + emailParam.getTpl(), emailParam.getTplParam());
+        String content = resolveTplContent(emailParam.getTpl(), emailParam.getTplParam());
 
+        String[] toArr = StringUtil.commaToArray(emailParam.getTo());
         if(emailParam.getHtmlFormat()){
-            return emailClient.sendHtmlMail(emailParam.getFrom(), emailParam.getTo(), emailParam.getCc(), emailParam.getSubject(), content);
+            return emailClient.sendHtmlMail(emailParam.getFrom(), toArr, emailParam.getCc(), emailParam.getSubject(), content);
         }else{
-            return emailClient.sendTextMail(emailParam.getFrom(), emailParam.getTo(), emailParam.getCc(), emailParam.getSubject(), content);
+            return emailClient.sendTextMail(emailParam.getFrom(), toArr, emailParam.getCc(), emailParam.getSubject(), content);
         }
     }
 
@@ -164,27 +245,7 @@ public class EmailBiz {
         msgDto.setTpl(emailParam.getTpl());
         msgDto.setTplParam(emailParam.getTplParam());
         msgDto.setHtmlFormat(emailParam.getHtmlFormat());
-        return amqSender.sendOne(msgDto);
-    }
-
-    /**
-     * 同步发送邮件
-     * @param msgDto
-     * @return
-     */
-    public boolean send(EmailMsgDto msgDto){
-        String content;
-        if(StringUtil.isNotEmpty(msgDto.getTpl())){
-            content = templateResolver.resolve(TEMPLATE_FOLDER + msgDto.getTpl(), msgDto.getTplParam());
-        }else{
-            content = msgDto.getContent();
-        }
-
-        if(msgDto.getHtmlFormat()){
-            return emailClient.sendHtmlMail(msgDto.getFrom(), msgDto.getTo(), msgDto.getCc(), msgDto.getSubject(), content);
-        }else{
-            return emailClient.sendTextMail(msgDto.getFrom(), msgDto.getTo(), msgDto.getCc(), msgDto.getSubject(), content);
-        }
+        return mqSender.sendOne(msgDto);
     }
 
     /**
@@ -196,35 +257,47 @@ public class EmailBiz {
     }
 
     /**
+     * 根据模板名称和模板参数解析出模板内容
+     * @param tplName
+     * @param paramMap
+     * @return
+     */
+    public String resolveTplContent(String tplName, Map<String, Object> paramMap){
+        String tplPath = TEMPLATE_FOLDER + tplName;
+        return templateResolver.resolve(tplPath, paramMap);
+    }
+
+    /**
      * 取得收件人记录
      * @param groupKey  组名
-     * @return  左：发件人，中：收件人，右：抄送人列表
+     * @return  左：发件人，中：收件人列表，右：抄送人列表
      */
-    private ImmutableTriple<String, String, String[]> getMailSendInfo(String groupKey){
-        MailReceiver mailReceiver = mailReceiverDao.getByGroupKey(groupKey);
-        if(mailReceiver == null){
+    private ImmutableTriple<String, String[], String[]> getMailSendInfo(String groupKey){
+        MailGroup mailGroup = mailGroupDao.getByGroupKey(groupKey);
+        if(mailGroup == null){
             throw new BizException(BizException.BIZ_INVALID, "groupKey=" + groupKey + "对应的收件人记录不存在");
         }
 
-        String from = mailReceiver.getSender();
-        List<String> toList = JsonUtil.toList(mailReceiver.getReceivers(), String.class);
+        String from = mailGroup.getSender();
         if(StringUtil.isEmpty(from)){
             throw new BizException(BizException.BIZ_INVALID, "发件人为空");
-        }else if(toList == null || toList.isEmpty()){
+        }else if(StringUtil.isEmpty(mailGroup.getReceivers())){
             throw new BizException(BizException.BIZ_INVALID, "收件人为空");
         }
 
-        //把第一个作为收件人，其他作为抄送人
-        String to = null;
-        String[] ccArray = toList.size() <= 1 ? null : new String[toList.size() - 1];
-        for(int i=0; i<toList.size(); i++){
-            if (i == 0) {
-                to = toList.get(0);
-            } else {
-                ccArray[i-1] = toList.get(i);
-            }
-        }
+        //收件人、抄送人 格式解析
+        List<String> toList = JsonUtil.toList(mailGroup.getReceivers(), String.class);
+        String[] toArr = new String[toList.size()];
+        toList.toArray(toArr);
 
-        return ImmutableTriple.of(from, to, ccArray);
+        List<String> ccList = null;
+        if(StringUtil.isNotEmpty(mailGroup.getCc())){
+            ccList = JsonUtil.toList(mailGroup.getCc(), String.class);
+        }
+        String[] ccArr = ccList != null ? new String[ccList.size()] : null;
+        if(ccList != null){
+            ccList.toArray(ccArr);
+        }
+        return ImmutableTriple.of(from, toArr, ccArr);
     }
 }

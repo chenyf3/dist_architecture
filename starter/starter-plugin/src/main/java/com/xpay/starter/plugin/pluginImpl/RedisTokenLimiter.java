@@ -26,17 +26,17 @@ public class RedisTokenLimiter implements RateLimiter {
 
     @Override
     public boolean tryAcquire(String name, int replenishRate){
-        return tryAcquire(name, replenishRate, replenishRate+1);
+        return tryAcquire(name, replenishRate, replenishRate + 1);
     }
 
     /**
      * 获取令牌，成功返回true，失败返回false
-     * 怎么理解replenishRate和burstCapacity这两个参数呢：一开始，令牌桶是满的，等于burstCapacity的值，然后，突然大流量涌进来，
-     * 此时被放行的流量最大不会超过burstCapacity，如果大流量持续涌入，则被放行的流量最多也不会超过replenishRate的值
+     * 一般情况下放行的流速不会超过replenishRate的值，因为这个值代表生产令牌的速率，但也可能存在一种情况是桶里面的令牌是满的，这个时候突然有大流量涌进来，
+     * 此时被放行的流量最大不会超过burstCapacity，如果大流量持续涌入，则被放行的流量基本会维持在replenishRate这个值附近
      *
      * @param name             限流的key值
      * @param replenishRate    桶填充速率(单位：个/秒)，就是允许用户每秒执行多少请求
-     * @param burstCapacity    桶容量，一秒钟内允许执行的最大请求数。
+     * @param burstCapacity    桶容量，此参数也可理解为系统的瞬时最大承载量
      * @return
      */
     @Override
@@ -44,9 +44,10 @@ public class RedisTokenLimiter implements RateLimiter {
         if(replenishRate > burstCapacity){
             replenishRate = burstCapacity;
         }
+
+        String now = String.valueOf(Instant.now().getEpochSecond());//获取到秒，这个决定了 replenishRate 这个参数的单位就是 个/秒
         List<String> keys = getKeys(name);
-        List<String> scriptArgs = Arrays.asList(replenishRate + "", burstCapacity + "",
-                Instant.now().getEpochSecond() + "", "1");
+        List<String> scriptArgs = Arrays.asList(String.valueOf(replenishRate), String.valueOf(burstCapacity), now, "1");
 
         String sha = shaCache.getIfPresent(name);
         if(sha == null){
@@ -55,8 +56,7 @@ public class RedisTokenLimiter implements RateLimiter {
             logger.info("script load success, sha = {}", sha);
         }
         List<Long> results = redisClient.evalsha(sha, keys, scriptArgs, List.class);
-        boolean allowed = results != null && results.get(0) == 1L;
-        return allowed;
+        return results != null && results.get(0) == 1L;
     }
 
     private List<String> getKeys(String id) {
@@ -81,6 +81,17 @@ public class RedisTokenLimiter implements RateLimiter {
 
     /**
      * 令牌桶算法，来自spring-cloud-gateway项目下/META-INF/scripts/request_rate_limiter.lua
+     * 核心思想：
+     *  1、当前剩余令牌数量 = 上次取出后剩余的令牌数量 + (当前时间 - 上次取出时间) * 令牌生成速率，
+     *  2、因为桶是有容量的，所以 当前剩余令牌数量 = min(桶的容量, 当前剩余令牌数量)
+     *  3、如果 当前剩余令牌数量 是大于等于需要取出的数量则通过，否则发生限流
+     *
+     *  脚本有关解释说明如下：
+     *    2个key：第1个key是存放当前剩余token数量，第2个key是存放上次获取token的时间戳
+     *    4个参数：第1个是令牌发放速率(个/秒，个/毫秒，单位取决于传入的时间是秒还是毫秒)，第2个是令牌桶的容量，第3个是当前时间，第4个本次需要获取的令牌数量
+     *    fill_time变量：脚本中的fill_time为容量除以速率，也就是桶中令牌填满需要花费的时间，然后以这个时间的2倍作为上面两个key的失效时间
+     *    last_tokens变量：脚本中last_tokens为当前剩余的token数量
+     *    last_refreshed变量：脚本中last_refreshed为上次获取token的时间
      */
     public final static String LIMIT_SCRIPT = "" +
             "local tokens_key = KEYS[1];" +

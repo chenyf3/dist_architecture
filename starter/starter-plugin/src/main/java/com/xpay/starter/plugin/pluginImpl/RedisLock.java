@@ -193,6 +193,7 @@ public class RedisLock implements DistributedLock<RLock> {
                 } catch (Exception e) {
                 }
             }
+            //关闭客户端，第1个参数是静默等待时间，第2个参数是最大等待时间，第3个参数是时间单位
             client.shutdown(3, 7, TimeUnit.SECONDS);
         }
     }

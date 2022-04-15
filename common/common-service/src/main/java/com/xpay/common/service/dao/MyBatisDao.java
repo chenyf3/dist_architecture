@@ -55,18 +55,18 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
     /**
      * ----------------  在mybatis的mapper文件中一些常用的、并且跟本类中的方法相对应的sqlId  ------------------
      */
-    private final static String INSERT_SQL = "insert";
-    private final static String INSERT_LIST_SQL = "batchInsert";
-    private final static String UPDATE_SQL = "update";
-    private final static String UPDATE_IF_NOT_NULL_SQL = "updateIfNotNull";
-    private final static String DELETE_BY_SQL = "deleteBy";
-    private final static String COUNT_BY_SQL = "countBy";
-    private final static String STATISTICS_BY_SQL = "statisticsBy";
-    private final static String LIST_BY_SQL = "listBy";
-    private final static String GET_BY_PK_SQL = "getById";
-    private final static String LIST_BY_PK_LIST_SQL = "listByIdList";
-    private final static String DELETE_BY_PK_SQL = "deleteById";
-    private final static String DELETE_BY_PK_LIST_SQL = "deleteByIdList";
+    protected final static String INSERT_SQL = "insert";
+    protected final static String INSERT_LIST_SQL = "batchInsert";
+    protected final static String UPDATE_SQL = "update";
+    protected final static String UPDATE_IF_NOT_NULL_SQL = "updateIfNotNull";
+    protected final static String DELETE_BY_SQL = "deleteBy";
+    protected final static String COUNT_BY_SQL = "countBy";
+    protected final static String STATISTICS_BY_SQL = "statisticsBy";
+    protected final static String LIST_BY_SQL = "listBy";
+    protected final static String GET_BY_PK_SQL = "getById";
+    protected final static String LIST_BY_PK_LIST_SQL = "listByIdList";
+    protected final static String DELETE_BY_PK_SQL = "deleteById";
+    protected final static String DELETE_BY_PK_LIST_SQL = "deleteByIdList";
 
     @Autowired
     @Override
@@ -323,6 +323,49 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
      */
     public <E> List<E> listBy(String sqlId, Map<String, Object> paramMap) {
         return this.listBy(sqlId, paramMap, null);
+    }
+
+    public <E> List<E> listBy(Map<String, Object> paramMap, Integer offset, Integer limit) {
+
+    }
+
+    public <E> List<E> listBy(Map<String, Object> paramMap, String sortColumns, Integer offset, Integer limit) {
+
+    }
+
+    /**
+     * 根据自定义语句，取得符合条件的记录并返回List(分页、不排序)
+     * @param sqlId         mapper文件中的sqlId
+     * @param paramMap      查询参数
+     * @param offset        分页时的起始偏移量
+     * @param limit         当前页查询条数
+     * @return
+     */
+    public <E> List<E> listBy(String sqlId, Map<String, Object> paramMap, Integer offset, Integer limit) {
+        return listBy(sqlId, paramMap, null, offset, limit);
+    }
+
+    /**
+     * 根据自定义语句，取得符合条件的记录并返回List(分页、可排序)
+     * @param sqlId         mapper文件中的sqlId
+     * @param paramMap      查询参数
+     * @param sortColumns   排序字段
+     * @param offset        分页时的起始偏移量
+     * @param limit         当前页查询条数
+     * @param <E>
+     * @return
+     */
+    public <E> List<E> listBy(String sqlId, Map<String, Object> paramMap, String sortColumns, Integer offset, Integer limit) {
+        if (isNotEmpty(sortColumns)) {
+            this.checkSortColumns(sortColumns);
+            if (paramMap == null) {
+                paramMap = new HashMap(1);
+            }
+            paramMap.put(SORT_COLUMNS, sortColumns);
+        } else {
+            this.checkSortColumns(paramMap);
+        }
+        return this.getSqlSession().selectList(fillSqlId(sqlId), paramMap, new RowBounds(offset, limit));
     }
 
     /**

@@ -13,3 +13,7 @@ token-server与sentinel-dashboard这两者的部署性质还挺像的，两者�
 例列表，然后重新选择实例进行连接，能够同时满足高可用、高拓展、高性能，不足点就是需要依赖注册中心，不过因为token-server本身就需要依赖nacos作为配置中心，
 而nacos还同时可以作为注册中心(zookeeper、redis等也一样可以)，所以，也没有增加额外的负担，部署示例图如下：  
 ![arch_pic](/docs/images/sentinel-token-server.png)
+
+## 注意点
+1. 如果是采用服务注册-发现的模式，需要starter-sentinel中的客户端来配合使用
+2. token-server实例拓容、缩容时(宕机可理解为非人为缩容)，这个实例上的统计数据将不存在，客户端会连接到其他的token-server实例，在这个时间段内的统计是不准确的

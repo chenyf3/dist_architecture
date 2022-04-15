@@ -40,6 +40,11 @@ public class SmsFacadeImpl implements SmsFacade {
     }
 
     @Override
+    public boolean sendAsync(SmsSendDto smsParam) {
+        return smsBiz.sendAsync(smsParam);
+    }
+
+    @Override
     public SmsQueryResp query(SmsQueryParam queryParam){
         return smsBiz.query(queryParam);
     }
