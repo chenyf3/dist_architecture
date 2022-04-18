@@ -455,7 +455,6 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
      */
     public <K, E> Map<K, E> mapBy(String sqlId, Map<String, Object> paramMap, String property) {
         checkAndConvertSortColumns(paramMap);
-        property = camelToUnderscore(property);
         return this.getSqlSession().selectMap(fillSqlId(sqlId), paramMap, property);
     }
 
@@ -494,7 +493,6 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
         }
 
         paramMap = putSortColumnsIfNeed(paramMap, pageQuery.getSortColumns());
-        property = camelToUnderscore(property);
         RowBounds rowBounds = new RowBounds(getOffset(pageQuery), pageQuery.getPageSize());
         Map<K, E> dataMap = this.getSqlSession().selectMap(fillSqlId(sqlId), paramMap, property, rowBounds);
         if (!pageQuery.isNeedTotalRecord()) {
@@ -653,7 +651,7 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
         for(int i=0; i<sortColumnArray.length; i++){
             String[] sortColumn = sortColumnArray[i].split(" ");
             if(sortColumn.length > 1){
-                builder.append(camelToUnderscore(sortColumn[0])).append(" ").append(sortColumn[sortColumn.length - 1]);
+                builder.append(camelToUnderscore(sortColumn[0])).append(" ").append(sortColumn[sortColumn.length - 1]);//取最后一个，可避免中间有多个空格的情况
             }else{
                 builder.append(camelToUnderscore(sortColumn[0])).append(" asc");
             }
@@ -677,8 +675,7 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
      * @return
      */
     private int getOffset(PageQuery pageQuery) {
-        int calPageCurrent = pageQuery.getCurrentPage() - 1;
-        calPageCurrent = (calPageCurrent < 0) ? 0 : calPageCurrent;
+        int calPageCurrent = Math.max((pageQuery.getCurrentPage() - 1), 0);
         return calPageCurrent * pageQuery.getPageSize();
     }
 
@@ -721,9 +718,9 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
         //处理字符串
         for (int i = 0, l = charArray.length; i < l; i++) {
             char currChar = charArray[i];
-            if (currChar >= 65 && currChar <= 90) {//如果是大写字母则在前面添加下划线
+            if (currChar >= 65 && currChar <= 90) { //如果是大写字母则在前面添加下划线
                 builder.append("_").append(currChar);
-            } else if (currChar >= 97 && currChar <= 122) {//如果是小写字母，则转为大写
+            } else if (currChar >= 97 && currChar <= 122) { //如果是小写字母，则转为大写
                 builder.append((char)(currChar-32));
             } else {
                 builder.append(currChar);

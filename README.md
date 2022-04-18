@@ -90,5 +90,6 @@ TODO... Canal、Kafka、TiDB、ClickHouse、Elasticsearch、MongoDB、Flink 等
 6. service中需要为每一张数据库表创建对应的Entity实体类(Model层)，但不需要每一张表都需要有一个Biz类，可根据业务特性把多张表的操作逻辑归到同一个Biz中
 7. 统一使用starter-plugin下的相关客户端来操作MQ消息发送、redis操作、对象存储、分布式锁等等，方便统一维护，消息传递应使用MsgDto或者其子类
 8. 需要在service、web、gateway等系统之间共用的枚举、异常、dto、常量、注解等尽量放在common-statics中，只有自身项目使用到的可以放到当前项目中或者对应的facade中
+9. 数据库字段命名统一使用大写，多个单词使用下划线分割，比如：USER_NO，在MyBatisDao中传入驼峰命名格式的排序字段，会自动转换成下划线分割
 
 
