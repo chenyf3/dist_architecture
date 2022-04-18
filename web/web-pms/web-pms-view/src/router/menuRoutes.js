@@ -18,5 +18,5 @@ export const menuRoutes = {
     '/portal/portalAuthRevoke': () => import('@/views/portal/auth/RevokeAuthList'),
     '/baseConfig/productManage': () => import('@/views/base-config/product/ProductList'),
     '/baseConfig/productOpenManage': () => import('@/views/base-config/product/ProductOpenList'),
-    '/baseConfig/mailManage': () => import('@/views/base-config/mail/MailReceiveList'),
+    '/baseConfig/mailManage': () => import('@/views/base-config/mail/MailGroupList'),
 }

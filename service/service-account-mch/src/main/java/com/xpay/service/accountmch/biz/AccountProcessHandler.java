@@ -466,14 +466,11 @@ public class AccountProcessHandler {
         }
 
         try{
-            Map<String, Long> idMap = new HashMap<>();
-            idMap.put("processPendingId", processPendingId);
-
             MsgDto msgDto = new MsgDto();
             msgDto.setTopic(TopicDest.ACCOUNT_MCH_URGENT_PROCESS);
             msgDto.setTags(TopicGroup.ACCOUNT_MCH_GROUP);
             msgDto.setTrxNo(StringUtil.subLeft(trxNos, 32));
-            msgDto.setJsonParam(JsonUtil.toJson(idMap));
+            msgDto.addParam("processPendingId", String.valueOf(processPendingId));
 
             mqSender.sendOneAsync(msgDto, null);
             logger.info("trxNos={} 通知进行账务处理完毕", trxNos);
@@ -493,14 +490,11 @@ public class AccountProcessHandler {
         }
 
         try{
-            Map<String, Long> idMap = new HashMap<>();
-            idMap.put("processResultId", processResultId);
-
             MsgDto msgDto = new MsgDto();
             msgDto.setTopic(TopicDest.ACCOUNT_MCH_URGENT_CALLBACK);
             msgDto.setTags(TopicGroup.ACCOUNT_MCH_GROUP);
             msgDto.setTrxNo(StringUtil.subLeft(trxNos, 32));
-            msgDto.setJsonParam(JsonUtil.toJson(idMap));
+            msgDto.addParam("processResultId", String.valueOf(processResultId));
 
             mqSender.sendOneAsync(msgDto, null);
             logger.info("processResultId={} trxNos={} 通知进行账务处理结果回调完毕", processResultId, trxNos);

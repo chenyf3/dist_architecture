@@ -214,7 +214,7 @@ public class AMQSender implements MQSender {
 
     private Message buildTextMessage(Session session, MsgDto msg) throws JMSException {
         Map<String, String> header = msg.getHeader();
-        msg.setHeader(null);
+        msg.setHeader(null);//置空，避免冗余浪费空间
 
         if(header == null){
             header = new HashMap<>();

@@ -1,6 +1,5 @@
 package com.xpay.demo.lo4j2;
 
-import com.xpay.common.statics.dto.mq.MsgDto;
 import com.xpay.common.utils.JsonUtil;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

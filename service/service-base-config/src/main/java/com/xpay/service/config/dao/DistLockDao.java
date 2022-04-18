@@ -4,6 +4,7 @@ import com.xpay.common.service.dao.MyBatisDao;
 import com.xpay.service.config.entity.DistLock;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,9 +15,7 @@ import java.util.Map;
 public class DistLockDao extends MyBatisDao<DistLock, Long> {
 
     public DistLock getByResourceId(String resourceId) {
-        Map<String, Object> param = new HashMap<>(3);
-        param.put("resourceId", resourceId);
-        return getOne("getByResourceId", param);
+        return getOne("getByResourceId", Collections.singletonMap("resourceId", resourceId));
     }
 
 

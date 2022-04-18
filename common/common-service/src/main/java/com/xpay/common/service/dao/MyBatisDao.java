@@ -15,10 +15,7 @@ import org.springframework.util.Assert;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -218,12 +215,12 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
      * 根据自定义语句，获取符合条件的单个对象
      *
      * @param sqlId .
-     * @param param .
+     * @param paramMap .
      * @return .
      */
-    public <E> E getOne(String sqlId, Object param) {
-        checkSortColumns(param);
-        return this.getSqlSession().selectOne(fillSqlId(sqlId), param);
+    public <E> E getOne(String sqlId, Map<String, Object> paramMap) {
+        checkAndConvertSortColumns(paramMap);
+        return this.getSqlSession().selectOne(fillSqlId(sqlId), paramMap);
     }
 
     /**
@@ -242,12 +239,7 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
      * @return .
      */
     public List<T> listAll(String sortColumns) {
-        Map<String, String> paramMap = null;
-        if (isNotEmpty(sortColumns)) {
-            checkSortColumns(sortColumns);
-            paramMap = new HashMap<>(1);
-            paramMap.put(SORT_COLUMNS, sortColumns);
-        }
+        Map<String, Object> paramMap = putSortColumnsIfNeed(null, sortColumns);
         return this.getSqlSession().selectList(fillSqlId(LIST_BY_SQL), paramMap);
     }
 
@@ -264,11 +256,12 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
     /**
      * 根据自定义语句，取得符合条件的总记录数
      * @param sqlId     统计的sqlId
-     * @param param     查询参数
+     * @param paramMap  查询参数
      * @return
      */
-    public long countBy(String sqlId, Object param) {
-        Long counts = this.getSqlSession().selectOne(fillSqlId(sqlId), param);
+    public long countBy(String sqlId, Map<String, Object> paramMap) {
+        checkAndConvertSortColumns(paramMap);
+        Long counts = this.getSqlSession().selectOne(fillSqlId(sqlId), paramMap);
         return counts == null ? 0 : counts;
     }
 
@@ -290,6 +283,7 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
      * @return
      */
     public <S> S statisticsBy(String sqlId, Map<String, Object> paramMap) {
+        checkAndConvertSortColumns(paramMap);
         return this.getSqlSession().selectOne(fillSqlId(sqlId), paramMap);
     }
 
@@ -325,12 +319,30 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
         return this.listBy(sqlId, paramMap, null);
     }
 
+    /**
+     * 条件and查询并返回List(分页、不排序)
+     * @param paramMap
+     * @param offset
+     * @param limit
+     * @param <E>
+     * @return
+     */
     public <E> List<E> listBy(Map<String, Object> paramMap, Integer offset, Integer limit) {
-
+        return this.listBy(paramMap, null, offset, limit);
     }
 
+    /**
+     * 条件and查询并返回List(分页、排序)
+     * @param paramMap
+     * @param sortColumns
+     * @param offset
+     * @param limit
+     * @param <E>
+     * @return
+     */
     public <E> List<E> listBy(Map<String, Object> paramMap, String sortColumns, Integer offset, Integer limit) {
-
+        paramMap = putSortColumnsIfNeed(paramMap, sortColumns);
+        return this.getSqlSession().selectList(fillSqlId(LIST_BY_SQL), paramMap, new RowBounds(offset, limit));
     }
 
     /**
@@ -356,15 +368,7 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
      * @return
      */
     public <E> List<E> listBy(String sqlId, Map<String, Object> paramMap, String sortColumns, Integer offset, Integer limit) {
-        if (isNotEmpty(sortColumns)) {
-            this.checkSortColumns(sortColumns);
-            if (paramMap == null) {
-                paramMap = new HashMap(1);
-            }
-            paramMap.put(SORT_COLUMNS, sortColumns);
-        } else {
-            this.checkSortColumns(paramMap);
-        }
+        paramMap = putSortColumnsIfNeed(paramMap, sortColumns);
         return this.getSqlSession().selectList(fillSqlId(sqlId), paramMap, new RowBounds(offset, limit));
     }
 
@@ -376,16 +380,7 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
      * @return
      */
     public <E> List<E> listBy(String sqlId, Map<String, Object> paramMap, String sortColumns) {
-        if (isNotEmpty(sortColumns)) {
-            this.checkSortColumns(sortColumns);
-            if (paramMap == null) {
-                paramMap = new HashMap(1);
-            }
-            paramMap.put(SORT_COLUMNS, sortColumns);
-        } else {
-            this.checkSortColumns(paramMap);
-        }
-
+        paramMap = putSortColumnsIfNeed(paramMap, sortColumns);
         return this.getSqlSession().selectList(fillSqlId(sqlId), paramMap);
     }
 
@@ -423,28 +418,16 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
      */
     public <E> PageResult<List<E>> listPage(String sqlId, String countSqlId, Map<String, Object> paramMap, PageQuery pageQuery) {
         Long totalRecord = 0L;
-        List<E> dataList;
         if (pageQuery.isNeedTotalRecord()) {
             totalRecord = this.countBy(countSqlId, paramMap);
-            if (totalRecord <= 0) {
-                //如果总记录数为0，就直接返回了
-                dataList = new ArrayList<>();
-                return PageResult.newInstance(dataList, pageQuery, totalRecord);
+            if (totalRecord <= 0) { //如果总记录数为0，就直接返回了
+                return PageResult.newInstance(new ArrayList<>(), pageQuery, 0L);
             }
         }
 
-        if (isNotEmpty(pageQuery.getSortColumns())) {
-            checkSortColumns(pageQuery.getSortColumns());
-            if (paramMap == null) {
-                paramMap = new HashMap(1);
-            }
-            paramMap.put(SORT_COLUMNS, pageQuery.getSortColumns());
-        } else {
-            checkSortColumns(paramMap);
-        }
-
-        dataList = this.getSqlSession().selectList(fillSqlId(sqlId), paramMap,
-                new RowBounds(getOffset(pageQuery), pageQuery.getPageSize()));
+        paramMap = putSortColumnsIfNeed(paramMap, pageQuery.getSortColumns());
+        RowBounds rowBounds = new RowBounds(getOffset(pageQuery), pageQuery.getPageSize());
+        List<E> dataList = this.getSqlSession().selectList(fillSqlId(sqlId), paramMap, rowBounds);
         if (!pageQuery.isNeedTotalRecord()) {
             totalRecord = (long) dataList.size();
         }
@@ -471,7 +454,8 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
      * @return
      */
     public <K, E> Map<K, E> mapBy(String sqlId, Map<String, Object> paramMap, String property) {
-        checkSortColumns(paramMap);
+        checkAndConvertSortColumns(paramMap);
+        property = camelToUnderscore(property);
         return this.getSqlSession().selectMap(fillSqlId(sqlId), paramMap, property);
     }
 
@@ -502,28 +486,17 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
      */
     public <K, E> PageResult<Map<K, E>> mapPage(String sqlId, String countSqlId, Map<String, Object> paramMap, String property, PageQuery pageQuery) {
         Long totalRecord = 0L;
-        Map<K, E> dataMap;
         if (pageQuery.isNeedTotalRecord()) {
             totalRecord = this.countBy(countSqlId, paramMap);
-            if (totalRecord <= 0) {
-                //如果总记录数为0，就直接返回了
-                dataMap = new HashMap<>();
-                return PageResult.newInstance(dataMap, pageQuery, totalRecord);
+            if (totalRecord <= 0) { //如果总记录数为0，就直接返回了
+                return PageResult.newInstance(new HashMap<>(), pageQuery, 0L);
             }
         }
 
-        if (isNotEmpty(pageQuery.getSortColumns())) {
-            checkSortColumns(pageQuery.getSortColumns());
-            if (paramMap == null) {
-                paramMap = new HashMap(1);
-            }
-            paramMap.put(SORT_COLUMNS, pageQuery.getSortColumns());
-        } else {
-            checkSortColumns(paramMap);
-        }
-
-        dataMap = this.getSqlSession().selectMap(fillSqlId(sqlId), paramMap, property,
-                new RowBounds(getOffset(pageQuery), pageQuery.getPageSize()));
+        paramMap = putSortColumnsIfNeed(paramMap, pageQuery.getSortColumns());
+        property = camelToUnderscore(property);
+        RowBounds rowBounds = new RowBounds(getOffset(pageQuery), pageQuery.getPageSize());
+        Map<K, E> dataMap = this.getSqlSession().selectMap(fillSqlId(sqlId), paramMap, property, rowBounds);
         if (!pageQuery.isNeedTotalRecord()) {
             totalRecord = (long) dataMap.size();
         }
@@ -619,42 +592,73 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
     }
 
     /**
-     * 防止sortColumns参数里面的sql注入
-     * @param param
+     * 如果 sortColumns 参数有值，则添加到 paramMap 参数中去
+     * @param paramMap
+     * @param sortColumns
      * @return
      */
-    protected final void checkSortColumns(Object param) {
-        if(param == null) {
+    protected final Map<String, Object> putSortColumnsIfNeed(Map<String, Object> paramMap, String sortColumns){
+        if(isEmpty(sortColumns)) {
+            return paramMap;
+        }
+
+        if(paramMap == null){
+            paramMap = new HashMap<>();
+        }
+        paramMap.put(SORT_COLUMNS, sortColumns);
+        checkAndConvertSortColumns(paramMap);
+        return paramMap;
+    }
+
+    /**
+     * 检查排序字段的值是否合法并把字段转换成下划线分割（因为习惯上数据库中的字段是用下划线分割的）
+     * @param paramMap
+     */
+    protected final void checkAndConvertSortColumns(Map<String, Object> paramMap) {
+        if(paramMap == null || paramMap.isEmpty() || !paramMap.containsKey(SORT_COLUMNS)) {
             return;
         }
 
-        String sortColumns = null;
-        if (param instanceof String) {
-            sortColumns = (String) param;
-        } else if (param instanceof Map) {
-            Map map = (Map) param;
-            if (map.containsKey(SORT_COLUMNS)) {
-                Object obj = map.get(SORT_COLUMNS);
-                if (obj == null) {
-                    throw new IllegalArgumentException("sortColumns cannot be null");
-                } else if (obj instanceof String) {
-                    sortColumns = (String) obj;
-                } else {
-                    throw new IllegalArgumentException("sortColumns illegal data type");
-                }
-            }
+        Object value = paramMap.get(SORT_COLUMNS);
+        if (value == null) { //为null值时直接移除
+            paramMap.remove(SORT_COLUMNS);
+            return;
+        } else if (!(value instanceof String)){ //只能允许字符串类型
+            throw new IllegalArgumentException("sortColumns illegal data type");
         }
 
-        if (sortColumns == null) {
-            return;
-        } else if (isEmpty(sortColumns)) { //不允许空字符串
+        String sortColumns = (String) value;
+        if (isEmpty(sortColumns)) { //不允许空字符串
             throw new IllegalArgumentException("sortColumns cannot be empty string");
         }
 
+        //检测是否包含一些特殊字符，防止sql注入
         Matcher matcher = SQL_INJECT_DEFEND_PATTERN.matcher(sortColumns.trim());
         if (!matcher.matches()) {
             throw new IllegalArgumentException("sortColumns contains illegal character");
         }
+
+        sortColumns = sortColumnsToUnderscore(sortColumns);
+        paramMap.replace(SORT_COLUMNS, sortColumns);
+    }
+
+    /**
+     * 把排序字段转换成使用下划线分割
+     * @param sortColumns   排序字段，多个字段时用英文的逗号分割
+     * @return
+     */
+    protected final String sortColumnsToUnderscore(String sortColumns){
+        StringBuilder builder = new StringBuilder();
+        String[] sortColumnArray = sortColumns.split(",");
+        for(int i=0; i<sortColumnArray.length; i++){
+            String[] sortColumn = sortColumnArray[i].split(" ");
+            if(sortColumn.length > 1){
+                builder.append(camelToUnderscore(sortColumn[0])).append(" ").append(sortColumn[sortColumn.length - 1]);
+            }else{
+                builder.append(camelToUnderscore(sortColumn[0])).append(" asc");
+            }
+        }
+        return builder.toString();
     }
 
     /**
@@ -694,5 +698,37 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
      */
     private boolean isEmpty(String str) {
         return str == null || str.trim().length() == 0;
+    }
+
+    /**
+     * 把驼峰转换成下划线
+     * @param camelStr
+     * @return
+     */
+    private String camelToUnderscore(String camelStr) {
+        if (camelStr == null) {
+            return null;
+        }
+
+        //兼容只有一个单词或者本身就是使用下划线分割的情况
+        if(camelStr.equals(camelStr.toUpperCase()) || camelStr.equals(camelStr.toLowerCase())){
+            return camelStr;
+        }
+
+        // 将驼峰字符串转换成数组
+        char[] charArray = camelStr.toCharArray();
+        StringBuilder builder = new StringBuilder();
+        //处理字符串
+        for (int i = 0, l = charArray.length; i < l; i++) {
+            char currChar = charArray[i];
+            if (currChar >= 65 && currChar <= 90) {//如果是大写字母则在前面添加下划线
+                builder.append("_").append(currChar);
+            } else if (currChar >= 97 && currChar <= 122) {//如果是小写字母，则转为大写
+                builder.append((char)(currChar-32));
+            } else {
+                builder.append(currChar);
+            }
+        }
+        return builder.toString();
     }
 }

@@ -40,40 +40,40 @@ public class SmsBiz {
         LinkedHashMap<String, Object> tplParam = new LinkedHashMap();
         tplParam.put("code", code);//固定使用此参数名，在短信模板中设置参数名的时候也要用这个
 
-        SmsSendDto smsParam = new SmsSendDto();
-        smsParam.setPhone(phone);
-        smsParam.setTplName(tplName);
-        smsParam.setTplParam(tplParam);
-        smsParam.setSignName(signName);
-        smsParam.setTrxNo(trxNo);
-        return send(smsParam);
+        SmsSendDto sendDto = new SmsSendDto();
+        sendDto.setPhone(phone);
+        sendDto.setTplName(tplName);
+        sendDto.setTplParam(tplParam);
+        sendDto.setSignName(signName);
+        sendDto.setTrxNo(trxNo);
+        return send(sendDto);
     }
 
-    public SmsRespDto send(SmsSendDto smsParam) {
-        if (smsParam == null) {
+    public SmsRespDto send(SmsSendDto sendDto) {
+        if (sendDto == null) {
             throw new BizException("短信发送参数不能为空");
-        } else if (StringUtil.isEmpty(smsParam.getPhone())) {
+        } else if (StringUtil.isEmpty(sendDto.getPhone())) {
             throw new BizException("手机号不能为空");
-        } else if (StringUtil.isEmpty(smsParam.getTplName())) {
+        } else if (StringUtil.isEmpty(sendDto.getTplName())) {
             throw new BizException("短信模板名称不能为空");
         }
 
-        SmsTemplateEnum smsTemplate = getSmsTemplate(smsParam.getTplName());
+        SmsTemplateEnum smsTemplate = getSmsTemplate(sendDto.getTplName());
         SmsSender smsSender = getSmsSender(smsTemplate.getPlat());
         String tplCode = smsTemplate.getValue();
-        return smsSender.send(smsParam.getPhone(), tplCode, smsParam.getTplParam(), smsParam.getSignName(), smsParam.getTrxNo());
+        return smsSender.send(sendDto.getPhone(), tplCode, sendDto.getTplParam(), sendDto.getSignName(), sendDto.getTrxNo());
     }
 
-    public boolean sendAsync(SmsSendDto smsParam) {
-        if (smsParam == null) {
+    public boolean sendAsync(SmsSendDto sendDto) {
+        if (sendDto == null) {
             throw new BizException("短信发送参数不能为空");
-        } else if (StringUtil.isEmpty(smsParam.getPhone())) {
+        } else if (StringUtil.isEmpty(sendDto.getPhone())) {
             throw new BizException("手机号不能为空");
-        } else if (StringUtil.isEmpty(smsParam.getTplName())) {
+        } else if (StringUtil.isEmpty(sendDto.getTplName())) {
             throw new BizException("短信模板名称不能为空");
         }
 
-        SmsMsgDto msgDto = BeanUtil.newAndCopy(smsParam, SmsMsgDto.class);
+        SmsMsgDto msgDto = BeanUtil.newAndCopy(sendDto, SmsMsgDto.class);
         msgDto.setTopic(TopicDest.SMS_SEND_ASYNC);
         msgDto.setTags(TopicGroup.COMMON_GROUP);
         return mqSender.sendOne(msgDto);

@@ -9,6 +9,7 @@ import com.xpay.common.utils.StringUtil;
 import com.xpay.service.accountmch.entity.AccountMch;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class AccountMchDao extends MyBatisDao<AccountMch, Long> {
         if(StringUtil.isEmpty(accountNo)){
             return null;
         }
-        return getOne("getByAccountNo", accountNo);
+        return getOne("getByAccountNo", Collections.singletonMap("accountNo", accountNo));
     }
 
     public List<String> listAccountNoPage(Map<String, Object> paramMap, Integer pageCurrent, Integer pageSize, String sortColumn){

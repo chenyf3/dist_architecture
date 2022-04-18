@@ -91,16 +91,4 @@ public class EmailTest extends BaseTestCase {
             Thread.sleep(3000);
         }catch(Exception e){e.printStackTrace();}
     }
-
-    @Ignore
-    @Test
-    public void testMergeDelay(){
-        String groupKey = "SYS_MONITOR_ALERT_GROUP";
-        String subject = "测试合并发送";
-        String content = "合并发送主题邮件";
-        for(int i=0; i<1000; i++){
-            String trxNo = "PL0000000000" + (i+1);
-            emailFacade.sendHtmlMerge(groupKey, subject, content, trxNo);
-        }
-    }
 }

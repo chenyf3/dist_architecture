@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 消息传输对象
+ * 消息传输对象，如果传输的参数比较简单可以直接使用本对象，如果比较复杂，可以继承本类
  */
 public class MsgDto implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -32,14 +32,14 @@ public class MsgDto implements Serializable {
     protected String mchNo;
 
     /**
-     * json格式的参数，非必填
-     */
-    protected String jsonParam = null;
-
-    /**
      * MQ的消息头以及特殊的自定义消息头，不要使用它来传递业务数据
      */
     protected Map<String, String> header;
+
+    /**
+     * 参数，建议在参数比较少比较简单的情况下使用本属性，如果参数比较多比较复杂，新建一个MsgDto的子类来处理比较合适
+     */
+    protected Map<String, String> params;
 
     /**
      * 异常信息，比如，发送失败时的异常
@@ -85,14 +85,6 @@ public class MsgDto implements Serializable {
         this.mchNo = mchNo;
     }
 
-    public String getJsonParam() {
-        return jsonParam;
-    }
-
-    public void setJsonParam(String jsonParam) {
-        this.jsonParam = jsonParam;
-    }
-
     public Map<String, String> getHeader() {
         return header;
     }
@@ -101,11 +93,12 @@ public class MsgDto implements Serializable {
         this.header = header;
     }
 
-    public void addHeader(String key, String value){
-        if(header == null){
-            header = new HashMap<>();
-        }
-        header.put(key, value);
+    public Map<String, String> getParams() {
+        return params;
+    }
+
+    public void setParams(Map<String, String> params) {
+        this.params = params;
     }
 
     public Throwable getCause() {
@@ -114,5 +107,27 @@ public class MsgDto implements Serializable {
 
     public void setCause(Throwable cause) {
         this.cause = cause;
+    }
+
+    public void addHeader(String key, String value){
+        if(header == null){
+            synchronized (this) {
+                if (header == null) {
+                    header = new HashMap<>();
+                }
+            }
+        }
+        header.put(key, value);
+    }
+
+    public void addParam(String key, String value){
+        if(params == null){
+            synchronized (this) {
+                if (params == null) {
+                    params = new HashMap<>();
+                }
+            }
+        }
+        params.put(key, value);
     }
 }

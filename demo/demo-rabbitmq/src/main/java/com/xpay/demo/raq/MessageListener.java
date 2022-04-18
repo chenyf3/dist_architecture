@@ -88,7 +88,7 @@ public class MessageListener {
 
         MsgDto msgDto = new MsgDto();
         msgDto.setTrxNo(RandomUtil.get32LenStr());
-        msgDto.setJsonParam("{\"response\":\"reply success\"}");
+        msgDto.addParam("response", "reply success");
         return JsonUtil.toJson(msgDto);
     }
 

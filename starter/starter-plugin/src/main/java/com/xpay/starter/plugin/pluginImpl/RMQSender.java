@@ -275,7 +275,7 @@ public class RMQSender implements MQSender {
 
     private Message buildMessage(MsgDto msg, boolean msgToByte){
         Map<String, String> header = msg.getHeader();
-        msg.setHeader(null);
+        msg.setHeader(null);//置空，避免冗余浪费空间
 
         if(header == null){
             header = new HashMap<>();

@@ -8,6 +8,7 @@ import com.xpay.facade.message.dto.AmqTraceDto;
 import com.xpay.service.message.entity.AmqTrace;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +16,7 @@ import java.util.Map;
 public class AmqTraceDao extends MyBatisDao<AmqTrace, Long> {
 
     public AmqTraceDto getOriMsgByTraceId(String traceId){
-        return getOne("getOriMsgByTraceId", traceId);
+        return getOne("getOriMsgByTraceId", Collections.singletonMap("traceId", traceId));
     }
 
     public AmqTrace getFirstConsumeRecordByTraceIdAndClientFlag(String traceId, String clientFlag){

@@ -89,7 +89,7 @@ public class EmailBiz {
     }
 
     /**
-     * 延迟合并发送邮件，实际发送由 {@link EmailMergeSendTask} 来处理
+     * 延迟合并发送邮件，实际发送由 {@link com.xpay.service.message.task.EmailMergeSendTask} 来处理
      * @param groupKey
      * @param subject
      * @param trxNo
@@ -299,5 +299,33 @@ public class EmailBiz {
             ccList.toArray(ccArr);
         }
         return ImmutableTriple.of(from, toArr, ccArr);
+    }
+
+    public List<MailDelayRecord> listPendingDelayRecord(List<String> createDateList, Date endTime, Integer offset, Integer limit) {
+        return mailDelayRecordDao.listPendingRecord(createDateList, endTime, offset, limit);
+    }
+
+    public List<MailDelayRecord> listSendingOvertimeDelayRecord(List<String> createDateList, Date endTime, Integer offset, Integer limit){
+        return mailDelayRecordDao.listSendingOvertimeRecord(createDateList, endTime, offset, limit);
+    }
+
+    public List<MailDelayRecord> listFinishOvertimeDelayRecord(Date endTime, Integer offset, Integer limit) {
+        return mailDelayRecordDao.listFinishOvertimeRecord(endTime, offset, limit);
+    }
+
+    public int updatePendingDelayRecordToSending(List<Long> idList, Date sendStartTime){
+        return mailDelayRecordDao.updatePendingToSending(idList, sendStartTime);
+    }
+
+    public int revertSendingDelayRecordToPending(List<Long> idList){
+        return mailDelayRecordDao.revertSendingToPending(idList);
+    }
+
+    public int updateSendingDelayRecordToFinish(List<Long> idList, Date sendFinishTime){
+        return mailDelayRecordDao.updateSendingToFinish(idList, sendFinishTime);
+    }
+
+    public void deleteDelayRecord(List<Long> idList){
+        mailDelayRecordDao.deleteByIdList(idList);
     }
 }

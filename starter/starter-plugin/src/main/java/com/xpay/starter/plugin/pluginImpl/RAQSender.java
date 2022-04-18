@@ -295,7 +295,7 @@ public class RAQSender implements MQSender {
 
     private Message buildMessage(MsgDto msg){
         Map<String, String> header = msg.getHeader();
-        msg.setHeader(null);
+        msg.setHeader(null);//置空，避免冗余浪费空间
 
         byte[] body = Utils.toJson(msg).getBytes(StandardCharsets.UTF_8);
         MessageBuilder builder = MessageBuilder.withBody(body);

@@ -14,9 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class UrgentProcessListener {
@@ -34,9 +32,7 @@ public class UrgentProcessListener {
     public void urgentAccountProcess(String msg) {
         try {
             MsgDto msgDto = JsonUtil.toBean(msg, MsgDto.class);
-            Map<String, Long> idMap = JsonUtil.toBean(msgDto.getJsonParam(), HashMap.class);
-            Long processPendingId = idMap.get("processPendingId");
-
+            Long processPendingId = Long.valueOf(msgDto.getParams().get("processPendingId"));
             accountProcessHandler.process(processPendingId);
         } catch (Exception e) {
             logger.error("加急账务处理出现异常 MsgDto = {} ", msg, e);
@@ -51,8 +47,7 @@ public class UrgentProcessListener {
     public void urgentProcessResultCallback(String msg) {
         try {
             MsgDto msgDto = JsonUtil.toBean(msg, MsgDto.class);
-            Map<String, Long> idMap = JsonUtil.toBean(msgDto.getJsonParam(), HashMap.class);
-            Long processResultId = idMap.get("processResultId");
+            Long processResultId = Long.valueOf(msgDto.getParams().get("processResultId"));
             accountProcessResultBiz.sendProcessResultCallbackMsg(processResultId);
         } catch (Exception e) {
             logger.error("加急账务结果回调出现异常 MsgDto = {} ", msg, e);

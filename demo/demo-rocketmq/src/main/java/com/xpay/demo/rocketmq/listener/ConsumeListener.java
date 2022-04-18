@@ -82,7 +82,7 @@ public class ConsumeListener {
             logger.info("ReplyConsumer received = {}", JsonUtil.toJson(message));
 
             MsgDto msgDto = new MsgDto();
-            msgDto.setJsonParam("{\"msg\": \"消费端已收到消息\"}");
+            msgDto.addParam("msg", "消费端已收到消息");
             return msgDto;
         }
     }

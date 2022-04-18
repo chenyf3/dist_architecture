@@ -254,7 +254,7 @@
 		ORDER BY NUMBER ASC
 	</select>
 
-	<select id="getBrotherMaximalNumber" parameterType="long" resultType="string">
+	<select id="getBrotherMaximalNumber" resultType="string">
 		SELECT NUMBER FROM <include refid="table"/>
 		WHERE PARENT_ID = #{parentId,jdbcType=BIGINT}
 		ORDER BY NUMBER DESC limit 1

@@ -4,6 +4,7 @@ import com.xpay.common.statics.constants.mqdest.TopicGroup;
 import com.xpay.common.statics.dto.mq.MsgDto;
 import com.xpay.common.statics.exception.BizException;
 import com.xpay.common.utils.HttpUtil;
+import com.xpay.common.utils.JsonUtil;
 import com.xpay.common.utils.StringUtil;
 import com.xpay.starter.plugin.plugins.MQSender;
 import com.xpay.facade.timer.dto.JobInfoDto;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 /**
  * 任务被触发后发送通知
@@ -59,7 +61,7 @@ public class NotifyBiz {
         try {
             MsgDto msg = new MsgDto();
             msg.setTrxNo(this.buildTrxNo(jobInfo));
-            msg.setJsonParam(jobInfo.getParamJson() == null ? "" : jobInfo.getParamJson());
+            msg.setParams(JsonUtil.toBean(jobInfo.getParamJson(), HashMap.class));
 
             String destination = subDestination(jobInfo.getDestination(), "rmq://");
             String[] destArr = destination.split(MsgDto.SEPARATOR);
@@ -85,7 +87,7 @@ public class NotifyBiz {
         try{
             MsgDto msg = new MsgDto();
             msg.setTrxNo(this.buildTrxNo(jobInfo));
-            msg.setJsonParam(jobInfo.getParamJson() == null ? "" : jobInfo.getParamJson());
+            msg.setParams(JsonUtil.toBean(jobInfo.getParamJson(), HashMap.class));
 
             String destination = subDestination(jobInfo.getDestination(), "amq://");
             String[] destArr = destination.split(MsgDto.SEPARATOR);
@@ -111,7 +113,7 @@ public class NotifyBiz {
         try{
             MsgDto msg = new MsgDto();
             msg.setTrxNo(this.buildTrxNo(jobInfo));
-            msg.setJsonParam(jobInfo.getParamJson() == null ? "" : jobInfo.getParamJson());
+            msg.setParams(JsonUtil.toBean(jobInfo.getParamJson(), HashMap.class));
 
             String destination = subDestination(jobInfo.getDestination(), "raq://");
             String[] destArr = destination.split(MsgDto.SEPARATOR);

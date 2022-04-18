@@ -3,9 +3,7 @@ package com.xpay.service.message.listener;
 import com.xpay.common.statics.constants.mqdest.TopicDest;
 import com.xpay.common.utils.BeanUtil;
 import com.xpay.common.utils.JsonUtil;
-import com.xpay.common.utils.StringUtil;
 import com.xpay.facade.message.dto.EmailMsgDto;
-import com.xpay.facade.message.dto.EmailSendDto;
 import com.xpay.facade.message.dto.SmsMsgDto;
 import com.xpay.facade.message.dto.SmsSendDto;
 import com.xpay.service.message.biz.email.EmailBiz;
@@ -51,8 +49,8 @@ public class AMQListener {
     @JmsListener(destination = TopicDest.SMS_SEND_ASYNC, subscription = "smsAsyncConsume", concurrency = "1-5")
     public void smsAsyncConsume(String message) {
         SmsMsgDto msgDto = JsonUtil.toBean(message, SmsMsgDto.class);
-        SmsSendDto smsParam = BeanUtil.newAndCopy(msgDto, SmsSendDto.class);
-        smsBiz.send(smsParam);
+        SmsSendDto sendDto = BeanUtil.newAndCopy(msgDto, SmsSendDto.class);
+        smsBiz.send(sendDto);
     }
 
     /**

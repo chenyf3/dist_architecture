@@ -11,9 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Component
 public class ScheduleProcessListener {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -55,8 +52,7 @@ public class ScheduleProcessListener {
     @JmsListener(destination = TopicDest.ACCOUNT_MCH_SCHEDULE_PROCESS_ALERT, concurrency = "1-2", subscription = "scheduleProcessAlert")
     public void scheduleAccountProcessAlert(String msg){
         MsgDto msgDto = JsonUtil.toBean(msg, MsgDto.class);
-        Map<String, String> param = JsonUtil.toBean(msgDto.getJsonParam(), HashMap.class);
-        String taskType = param.get("taskType");
+        String taskType = msgDto.getParams().get("taskType");
         if("pendingLongAlert".equals(taskType)){
             accountAlertBiz.accountProcessPendingPendingLongAlert();
         }else if("processingLongAlert".equals(taskType)){

@@ -47,6 +47,6 @@ public class PortalAuthDao extends MyBatisDao<PortalAuth, Long> {
     }
 
     public String getBrotherMaximalNumber(Long parentId){
-        return getOne("getBrotherMaximalNumber", parentId);
+        return getOne("getBrotherMaximalNumber", Collections.singletonMap("parentId", parentId));
     }
 }

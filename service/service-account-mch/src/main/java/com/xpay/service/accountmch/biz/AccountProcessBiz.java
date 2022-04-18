@@ -69,8 +69,6 @@ public class AccountProcessBiz {
      * @return
      */
     public boolean asyncProcessBuffer(AccountRequestDto requestDto, List<AccountProcessDto> processDtoList) {
-        //打印一次日志，万一MQ出现丢消息的情况，还可通过日志找回
-        logger.info("requestDto={} processDtoList={}", JsonUtil.toJson(requestDto), JsonUtil.toJson(processDtoList));
         AccountProcessBufferDto bufferDto = new AccountProcessBufferDto();
         bufferDto.setRequestDto(requestDto);
         bufferDto.setProcessDtoList(processDtoList);
@@ -78,7 +76,17 @@ public class AccountProcessBiz {
         bufferDto.setTags(TopicGroup.ACCOUNT_MCH_GROUP);
         bufferDto.setTrxNo(processDtoList.get(0).getTrxNo());//只拿第一个，因为消费端不需要此参数值
         bufferDto.setMchNo(processDtoList.get(0).getAccountNo());//只拿第一个，因为消费端不需要此参数值
-        return mqSender.sendOne(bufferDto);
+        mqSender.sendOne(bufferDto, (msgDto) -> {
+            logger.warn("缓冲异步账务发送MQ失败，将直接入库处理");
+            try {
+                //如果MQ发送失败，则直接入库处理
+                asyncProcess(requestDto, processDtoList);
+            } catch (Exception e){
+                //万一还是失败了，则还可以通过日志找回
+                logger.error("缓冲异步账务入库失败 AccountProcessBufferDto:{}", JsonUtil.toJson(msgDto));
+            }
+        });
+        return true;
     }
 
     /**

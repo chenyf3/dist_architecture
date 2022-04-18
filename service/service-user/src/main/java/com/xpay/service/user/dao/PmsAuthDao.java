@@ -44,6 +44,6 @@ public class PmsAuthDao extends MyBatisDao<PmsAuth, Long> {
     }
 
     public String getBrotherMaximalNumber(Long parentId){
-        return getOne("getBrotherMaximalNumber", parentId);
+        return getOne("getBrotherMaximalNumber", Collections.singletonMap("parentId", parentId));
     }
 }

@@ -3,7 +3,7 @@ package com.xpay.service.message.serviceImpl;
 import com.xpay.facade.message.dto.EmailSendDto;
 import com.xpay.facade.message.service.EmailFacade;
 import com.xpay.service.message.biz.email.EmailBiz;
-import com.xpay.service.message.biz.email.EmailMergeSendTask;
+import com.xpay.service.message.task.EmailMergeSendTask;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -138,11 +138,11 @@ public class DemoController {
             msg.setTopic(Destinations.TOPIC_ORDERLY);
             msg.setTags(Destinations.TAGS_ONE);
             msg.setTrxNo(genTrxNo());
-            msg.setJsonParam("{\"msg\":\"订单创建\"}");
+            msg.addParam("msg", "订单创建");
             rmqSender.sendOrderly(msg, msg.getTrxNo(), timeout);
-            msg.setJsonParam("{\"msg\":\"订单已支付\"}");
+            msg.addParam("msg", "订单已支付");
             rmqSender.sendOrderly(msg, msg.getTrxNo(), timeout);
-            msg.setJsonParam("{\"msg\":\"订单已完成\"}");
+            msg.addParam("msg", "订单已完成");
             rmqSender.sendOrderly(msg, msg.getTrxNo(), timeout);
         }
         return Mono.just("ok");
@@ -158,7 +158,8 @@ public class DemoController {
         MsgDto msg = new MsgDto();
         msg.setTopic(Destinations.TOPIC_FAILOVER);
         msg.setTags("topicGroup_2");//使用此字段做业务分组 需要消息轨迹追踪时可以用上
-        msg.setJsonParam("{\"key_2\":\"value_2\"}, \"key_3\":\"value_3\"}");
+        msg.addParam("key_2", "value_2");
+        msg.addParam("key_3", "value_3");
         for(int i=0; i<100000; i++){
             try{
                 msg.setTrxNo(trxNo + i);
