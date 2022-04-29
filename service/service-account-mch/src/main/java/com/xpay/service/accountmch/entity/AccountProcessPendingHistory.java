@@ -2,10 +2,12 @@ package com.xpay.service.accountmch.entity;
 
 import com.xpay.common.service.annotations.PK;
 
+import java.io.Serializable;
+
 /**
  * 待账务处理归档表
  */
-public class AccountProcessPendingHistory {
+public class AccountProcessPendingHistory implements Serializable {
 
 	//columns START
 	/**

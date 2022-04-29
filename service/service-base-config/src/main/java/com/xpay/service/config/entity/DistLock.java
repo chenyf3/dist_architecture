@@ -4,12 +4,14 @@
 package com.xpay.service.config.entity;
 
 import com.xpay.common.service.annotations.PK;
+
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * 分布式锁实体类
  */
-public class DistLock {
+public class DistLock implements Serializable {
 
     //columns START
     @PK

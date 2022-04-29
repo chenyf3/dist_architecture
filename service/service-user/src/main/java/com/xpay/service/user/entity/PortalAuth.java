@@ -2,10 +2,12 @@ package com.xpay.service.user.entity;
 
 import com.xpay.common.service.annotations.PK;
 
+import java.io.Serializable;
+
 /**
  * 商户权限表
  */
-public class PortalAuth {
+public class PortalAuth implements Serializable {
 
 	//columns START
 	/**

@@ -5,10 +5,12 @@ package com.xpay.service.user.entity;
 
 import com.xpay.common.service.annotations.PK;
 
+import java.io.Serializable;
+
 /**
  * pms角色与权限关联表
  */
-public class PmsRoleAuth {
+public class PmsRoleAuth implements Serializable {
 
 	//columns START
 	/**

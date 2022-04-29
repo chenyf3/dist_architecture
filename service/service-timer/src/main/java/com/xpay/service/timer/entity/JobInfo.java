@@ -1,11 +1,12 @@
 package com.xpay.service.timer.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * @author chenyf on 2020/4/26.
  */
-public class JobInfo {
+public class JobInfo implements Serializable {
     /**
      * ID主键
      */

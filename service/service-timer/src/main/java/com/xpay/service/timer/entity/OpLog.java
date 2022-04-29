@@ -3,10 +3,12 @@
  */
 package com.xpay.service.timer.entity;
 
+import java.io.Serializable;
+
 /**
  * 操作日志表
  */
-public class OpLog {
+public class OpLog implements Serializable {
 
 	//columns START
 	/**

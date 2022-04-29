@@ -2,10 +2,12 @@ package com.xpay.service.accountmch.entity;
 
 import com.xpay.common.service.annotations.PK;
 
+import java.io.Serializable;
+
 /**
  * 账户余额快照
  */
-public class AccountBalanceSnap {
+public class AccountBalanceSnap implements Serializable {
 
 	//columns START
 	/**

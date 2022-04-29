@@ -2,10 +2,12 @@ package com.xpay.service.user.entity;
 
 import com.xpay.common.service.annotations.PK;
 
+import java.io.Serializable;
+
 /**
  * pms角色表
  */
-public class PmsRole {
+public class PmsRole implements Serializable {
 
 	//columns START
 	/**

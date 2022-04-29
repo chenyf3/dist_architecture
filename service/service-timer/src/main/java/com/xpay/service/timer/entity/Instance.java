@@ -1,9 +1,11 @@
 package com.xpay.service.timer.entity;
 
+import java.io.Serializable;
+
 /**
  * 运行实例表
  */
-public class Instance {
+public class Instance implements Serializable {
 
 	//columns START
 	/**

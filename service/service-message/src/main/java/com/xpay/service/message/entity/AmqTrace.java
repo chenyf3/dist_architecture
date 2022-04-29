@@ -2,12 +2,13 @@ package com.xpay.service.message.entity;
 
 import com.xpay.common.service.annotations.PK;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * activemq消息轨迹表
  */
-public class AmqTrace {
+public class AmqTrace implements Serializable {
 
 	//columns START
 	/**

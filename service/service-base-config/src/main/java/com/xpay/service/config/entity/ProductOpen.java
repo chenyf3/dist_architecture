@@ -5,12 +5,13 @@ package com.xpay.service.config.entity;
 
 import com.xpay.common.service.annotations.PK;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * 产品开通表
  */
-public class ProductOpen {
+public class ProductOpen implements Serializable {
 
 	//columns START
 	/**

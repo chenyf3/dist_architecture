@@ -10,24 +10,27 @@ import java.util.*;
 @Repository
 public class MailDelayRecordDao extends MyBatisDao<MailDelayRecord, Long> {
 
-    public List<MailDelayRecord> listPendingRecord(List<String> createDateList, Date endTime, Integer offset, Integer limit) {
+    public List<MailDelayRecord> listPendingRecord(List<String> createDateList, Date endTime, Integer offset, Integer limit, Integer maxSendTimes) {
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("createDateList", createDateList);
         paramMap.put("createTimeEnd", DateUtil.formatDateTime(endTime));
+        paramMap.put("maxSendTimes", maxSendTimes);
         return listBy("listPendingRecord", paramMap, "ID", offset, limit);
     }
 
-    public List<MailDelayRecord> listSendingOvertimeRecord(List<String> createDateList, Date endTime, Integer offset, Integer limit){
+    public List<MailDelayRecord> listSendingOvertimeRecord(List<String> createDateList, Date endTime, Integer offset, Integer limit, Integer maxSendTimes){
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("createDateList", createDateList);
         paramMap.put("sendStartTimeEnd", DateUtil.formatDateTime(endTime));
+        paramMap.put("maxSendTimes", maxSendTimes);
         return listBy("listSendingOvertimeRecord", paramMap, "ID", offset, limit);
     }
 
-    public List<MailDelayRecord> listFinishOvertimeRecord(Date endTime, Integer offset, Integer limit) {
+    public List<MailDelayRecord> listFinishOrOvertimesRecord(Date endTime, Integer offset, Integer limit, Integer maxSendTimes) {
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("createDateEnd", DateUtil.formatDate(endTime));
-        return listBy("listFinishOvertimeRecord", paramMap, "ID", offset, limit);
+        paramMap.put("maxSendTimes", maxSendTimes);
+        return listBy("listFinishOrOvertimesRecord", paramMap, "ID", offset, limit);
     }
 
     public int updatePendingToSending(List<Long> idList, Date sendStartTime){

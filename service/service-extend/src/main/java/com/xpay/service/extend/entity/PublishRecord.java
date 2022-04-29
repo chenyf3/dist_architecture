@@ -2,10 +2,12 @@ package com.xpay.service.extend.entity;
 
 import com.xpay.common.service.annotations.PK;
 
+import java.io.Serializable;
+
 /**
  * 项目发布记录表
  */
-public class PublishRecord {
+public class PublishRecord implements Serializable {
 
 	//columns START
 	/**

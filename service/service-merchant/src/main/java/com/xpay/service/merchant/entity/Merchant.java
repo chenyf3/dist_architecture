@@ -2,10 +2,12 @@ package com.xpay.service.merchant.entity;
 
 import com.xpay.common.service.annotations.PK;
 
+import java.io.Serializable;
+
 /**
  * 商户表
  */
-public class Merchant {
+public class Merchant implements Serializable {
 
 	//columns START
 	/**

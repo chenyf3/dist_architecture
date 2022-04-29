@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
  * @author chenyf
  * @date 2018-02-02
  */
-public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport {
+public class MyBatisDao<T extends Serializable, ID extends Serializable> extends SqlSessionDaoSupport {
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
     /**
      * 需要排序时排序字段在Map中的key名
@@ -56,6 +56,7 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
     protected final static String INSERT_LIST_SQL = "batchInsert";
     protected final static String UPDATE_SQL = "update";
     protected final static String UPDATE_IF_NOT_NULL_SQL = "updateIfNotNull";
+    protected final static String UPDATE_LIST_SQL = "batchUpdate";
     protected final static String DELETE_BY_SQL = "deleteBy";
     protected final static String COUNT_BY_SQL = "countBy";
     protected final static String STATISTICS_BY_SQL = "statisticsBy";
@@ -65,6 +66,10 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
     protected final static String DELETE_BY_PK_SQL = "deleteById";
     protected final static String DELETE_BY_PK_LIST_SQL = "deleteByIdList";
 
+    /**
+     * 注入SqlSessionTemplate实例对象，该实例对象由 mybatis-spring-boot-autoconfigure 模块产生，所有dao共用此实例
+     * @param sqlSessionTemplate
+     */
     @Autowired
     @Override
     public void setSqlSessionTemplate(SqlSessionTemplate sqlSessionTemplate) {
@@ -75,7 +80,7 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
     @Override
     protected void initDao() {
         Class cla = ClassUtil.getSuperClassGenericType(this.getClass(), 0);
-        this.setMapperNamespace(cla.getName());
+        this.setMapperNamespace(cla.getName());//把当前Dao所操作的实体类全路径名当作在Mapper文件中的namespace
 
         //设置primary key的列名称
         Field[] fields = cla.getDeclaredFields();
@@ -110,9 +115,10 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
      * @throws RuntimeException 当插入成功的记录数与list的size不一致时,抛出此异常
      */
     public void insert(List<T> list) {
+        int expectCount = list.size();
         int insertedRow = this.getSqlSession().insert(fillSqlId(INSERT_LIST_SQL), list);
-        if (insertedRow != list.size()) {
-            throw new DBException(DBException.AFFECT_COUNT_NOT_EXPECT, "数据插入的记录数与预期不匹配，预期:" + list.size() + ",实际插入:" + insertedRow);
+        if (insertedRow != expectCount) {
+            throw new DBException(DBException.AFFECT_COUNT_NOT_EXPECT, "实际插入的记录数("+insertedRow+")与预期插入记录数("+expectCount+")不匹配");
         }
     }
 
@@ -148,49 +154,48 @@ public class MyBatisDao<T, ID extends Serializable> extends SqlSessionDaoSupport
 
     /**
      * 更新数据
-     *
      * @param entity 待更新的实体
-     * @throws RuntimeException 当成功更新的数据条数不为1时，抛出此异常
+     * @throws DBException 当成功更新的数据条数不为1时，抛出此异常
      */
     public void update(T entity) {
         int updatedRow = this.getSqlSession().update(fillSqlId(UPDATE_SQL), entity);
-        if (updatedRow != 1) {
-            throw new DBException(DBException.AFFECT_COUNT_NOT_UNIQUE, "数据更新成功的记录数不为1, updatedRow="+updatedRow);
+        if(updatedRow == 1){
+            return;
         }
-    }
-
-    /**
-     * 批量更新对象，如果需要保持数据的一致性，需要确保调用这个方法的地方有支持事务
-     *
-     * @param entityList 待更新的实体列表
-     */
-    public void update(List<T> entityList) {
-        int result = 0;
-        int expectCount = entityList.size();
-        for (T entity : entityList) {
-            int updateCount = this.getSqlSession().update(fillSqlId(UPDATE_SQL), entity);
-            result += updateCount;
-        }
-        if (result != entityList.size()) {
-            throw new DBException(DBException.AFFECT_COUNT_NOT_EXPECT, "数据更新成功的记录数(" + result + ")与预期数(" + expectCount + ")不匹配");
-        }
+        String errMsg = updatedRow <= 0 ? "记录未更新成功" : "更新成功的记录数大于1";
+        errMsg += ",updatedRow="+updatedRow;
+        throw new DBException(DBException.AFFECT_COUNT_NOT_UNIQUE, errMsg);
     }
 
     /**
      * 按值更新，字段值不为null的才更新
      *
      * @param entity 待更新的实体
-     * @throws RuntimeException 当成功更新的数据条数不为1时，抛出此异常
+     * @throws DBException 当成功更新的数据条数不为1时，抛出此异常
      */
     public void updateIfNotNull(T entity) {
         int updatedRow = this.getSqlSession().update(fillSqlId(UPDATE_IF_NOT_NULL_SQL), entity);
-        if (updatedRow != 1) {
-            throw new DBException(DBException.AFFECT_COUNT_NOT_UNIQUE, "数据更新成功的记录数不为1, updatedRow="+updatedRow);
+        if(updatedRow == 1){
+            return;
+        }
+        String errMsg = updatedRow <= 0 ? "记录未更新成功" : "更新成功的记录数大于1";
+        throw new DBException(DBException.AFFECT_COUNT_NOT_UNIQUE, errMsg + ",updatedRow="+updatedRow);
+    }
+
+    /**
+     * 批量更新对象，如果需要保障这一批数据保持原子性，需要确保调用这个方法的地方有支持事务，如果实际更新记录数和预期更新记录数不一致的话，会抛出异常让事务回滚
+     * @param entityList 待更新的实体列表
+     */
+    public void update(List<T> entityList) {
+        int expectCount = entityList.size();
+        int updateCount = this.getSqlSession().update(fillSqlId(UPDATE_LIST_SQL), entityList);
+        if (updateCount != expectCount) {
+            throw new DBException(DBException.AFFECT_COUNT_NOT_EXPECT, "实际更新成功的记录数(" + updateCount + ")与预期更新记录数(" + expectCount + ")不匹配");
         }
     }
 
     /**
-     * 按自定义sql的更新
+     * 按自定义sql更新
      *
      * @param sqlId .
      * @param param .

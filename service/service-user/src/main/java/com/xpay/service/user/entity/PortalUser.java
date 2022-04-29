@@ -5,10 +5,12 @@ package com.xpay.service.user.entity;
 
 import com.xpay.common.service.annotations.PK;
 
+import java.io.Serializable;
+
 /**
  * 商户用户表
  */
-public class PortalUser {
+public class PortalUser implements Serializable {
 
 	//columns START
 	/**

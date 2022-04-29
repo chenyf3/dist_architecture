@@ -5,10 +5,12 @@ package com.xpay.service.user.entity;
 
 import com.xpay.common.service.annotations.PK;
 
+import java.io.Serializable;
+
 /**
  * pms用户操作日志表
  */
-public class PmsOperateLog {
+public class PmsOperateLog implements Serializable {
 
 	//columns START
 	/**

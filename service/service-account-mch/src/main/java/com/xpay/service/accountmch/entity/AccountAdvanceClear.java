@@ -2,10 +2,12 @@ package com.xpay.service.accountmch.entity;
 
 import com.xpay.common.service.annotations.PK;
 
+import java.io.Serializable;
+
 /**
  * 账户垫资清零表
  */
-public class AccountAdvanceClear {
+public class AccountAdvanceClear implements Serializable {
 
 	//columns START
 	/**

@@ -2,10 +2,12 @@ package com.xpay.service.accountmch.entity;
 
 import com.xpay.common.service.annotations.PK;
 
+import java.io.Serializable;
+
 /**
  * 账务处理结果表
  */
-public class AccountProcessResult {
+public class AccountProcessResult implements Serializable {
 
 	//columns START
 	/**

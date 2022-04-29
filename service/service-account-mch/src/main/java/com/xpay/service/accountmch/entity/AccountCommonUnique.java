@@ -2,10 +2,12 @@ package com.xpay.service.accountmch.entity;
 
 import com.xpay.common.service.annotations.PK;
 
+import java.io.Serializable;
+
 /**
  * 账务唯一约束表
  */
-public class AccountCommonUnique {
+public class AccountCommonUnique implements Serializable {
 
 	//columns START
 	/**

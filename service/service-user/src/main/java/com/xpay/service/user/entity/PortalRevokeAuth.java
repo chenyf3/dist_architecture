@@ -5,10 +5,12 @@ package com.xpay.service.user.entity;
 
 import com.xpay.common.service.annotations.PK;
 
+import java.io.Serializable;
+
 /**
  * 商户功能回收记录表
  */
-public class PortalRevokeAuth {
+public class PortalRevokeAuth implements Serializable {
 
 	//columns START
 	/**

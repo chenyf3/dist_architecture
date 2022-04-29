@@ -19,6 +19,7 @@ import com.xpay.starter.plugin.plugins.MQSender;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.util.Date;
@@ -115,6 +116,7 @@ public class EmailBiz {
         delayRecord.setTrxNo(trxNo == null ? "" : trxNo);
         delayRecord.setContent(content);
         delayRecord.setStatus(EmailSendStatusEnum.PENDING.getValue());
+        delayRecord.setSendTimes(0);
         mailDelayRecordDao.insert(delayRecord);
         return true;
     }
@@ -301,20 +303,29 @@ public class EmailBiz {
         return ImmutableTriple.of(from, toArr, ccArr);
     }
 
-    public List<MailDelayRecord> listPendingDelayRecord(List<String> createDateList, Date endTime, Integer offset, Integer limit) {
-        return mailDelayRecordDao.listPendingRecord(createDateList, endTime, offset, limit);
+    public List<MailDelayRecord> listPendingDelayRecord(List<String> createDateList, Date endTime, Integer offset, Integer limit, Integer maxSendTimes) {
+        return mailDelayRecordDao.listPendingRecord(createDateList, endTime, offset, limit, maxSendTimes);
     }
 
-    public List<MailDelayRecord> listSendingOvertimeDelayRecord(List<String> createDateList, Date endTime, Integer offset, Integer limit){
-        return mailDelayRecordDao.listSendingOvertimeRecord(createDateList, endTime, offset, limit);
+    public List<MailDelayRecord> listSendingOvertimeDelayRecord(List<String> createDateList, Date endTime, Integer offset, Integer limit, Integer maxSendTimes){
+        return mailDelayRecordDao.listSendingOvertimeRecord(createDateList, endTime, offset, limit, maxSendTimes);
     }
 
-    public List<MailDelayRecord> listFinishOvertimeDelayRecord(Date endTime, Integer offset, Integer limit) {
-        return mailDelayRecordDao.listFinishOvertimeRecord(endTime, offset, limit);
+    public List<MailDelayRecord> listFinishOrOvertimesDelayRecord(Date endTime, Integer offset, Integer limit, Integer maxSendTimes) {
+        return mailDelayRecordDao.listFinishOrOvertimesRecord(endTime, offset, limit, maxSendTimes);
     }
 
-    public int updatePendingDelayRecordToSending(List<Long> idList, Date sendStartTime){
-        return mailDelayRecordDao.updatePendingToSending(idList, sendStartTime);
+    /**
+     * 把'待发送'更新为'发送中'，并且提供事务处理，保证这一批次记录的原子性
+     * @param idList
+     * @param sendStartTime
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void updatePendingDelayRecordToSending(List<Long> idList, Date sendStartTime){
+        int successCount = mailDelayRecordDao.updatePendingToSending(idList, sendStartTime);
+        if(successCount != idList.size()){
+            throw new BizException(BizException.BIZ_INVALID, "实际更新记录数("+successCount+")与预期更新记录数("+idList.size()+")不一致");
+        }
     }
 
     public int revertSendingDelayRecordToPending(List<Long> idList){
@@ -325,6 +336,7 @@ public class EmailBiz {
         return mailDelayRecordDao.updateSendingToFinish(idList, sendFinishTime);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void deleteDelayRecord(List<Long> idList){
         mailDelayRecordDao.deleteByIdList(idList);
     }

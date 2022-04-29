@@ -2,10 +2,12 @@ package com.xpay.service.user.entity;
 
 import com.xpay.common.service.annotations.PK;
 
+import java.io.Serializable;
+
 /**
  * pms功能表
  */
-public class PmsAuth {
+public class PmsAuth implements Serializable {
 
 	//columns START
 	/**

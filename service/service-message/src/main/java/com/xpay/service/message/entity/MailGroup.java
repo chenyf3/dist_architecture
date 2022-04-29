@@ -5,10 +5,12 @@ package com.xpay.service.message.entity;
 
 import com.xpay.common.service.annotations.PK;
 
+import java.io.Serializable;
+
 /**
  * 邮件接收人
  */
-public class MailGroup {
+public class MailGroup implements Serializable {
 
 	//columns START
 	/**

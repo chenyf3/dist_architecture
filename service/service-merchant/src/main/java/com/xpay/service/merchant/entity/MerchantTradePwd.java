@@ -5,10 +5,12 @@ package com.xpay.service.merchant.entity;
 
 import com.xpay.common.service.annotations.PK;
 
+import java.io.Serializable;
+
 /**
  * 商户交易密码表
  */
-public class MerchantTradePwd {
+public class MerchantTradePwd implements Serializable {
 
 	//columns START
 	/**

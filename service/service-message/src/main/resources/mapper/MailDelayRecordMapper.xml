@@ -15,6 +15,7 @@
 		<result column="CONTENT" property="content" jdbcType="LONGVARCHAR"/>
 		<result column="TRX_NO" property="trxNo" jdbcType="VARCHAR"/>
 		<result column="STATUS" property="status" jdbcType="TINYINT"/>
+		<result column="SEND_TIMES" property="sendTimes" jdbcType="SMALLINT"/>
 		<result column="SEND_START_TIME" property="sendStartTime" jdbcType="TIMESTAMP"/>
 		<result column="SEND_FINISH_TIME" property="sendFinishTime" jdbcType="TIMESTAMP"/>
 	</resultMap>
@@ -30,6 +31,7 @@
 		CONTENT,
 		TRX_NO,
 		STATUS,
+		SEND_TIMES,
 		SEND_START_TIME,
 		SEND_FINISH_TIME
 	</sql>
@@ -45,6 +47,7 @@
         	CONTENT,
         	TRX_NO,
         	STATUS,
+        	SEND_TIMES,
         	SEND_START_TIME,
         	SEND_FINISH_TIME
         ) VALUES (
@@ -56,13 +59,14 @@
 			#{content,jdbcType=LONGVARCHAR},
 			#{trxNo,jdbcType=VARCHAR},
 			#{status,jdbcType=TINYINT},
+			#{sendTimes,jdbcType=SMALLINT},
 			#{sendStartTime,jdbcType=TIMESTAMP},
 			#{sendFinishTime,jdbcType=TIMESTAMP}
         )
 	</insert>
 
 	<!-- 批量插入记录 -->
-	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="id" parameterType="list">
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
 		INSERT INTO <include refid="table" /> (
         	CREATE_TIME,
         	CREATE_DATE,
@@ -72,6 +76,7 @@
         	CONTENT,
         	TRX_NO,
         	STATUS,
+        	SEND_TIMES,
         	SEND_START_TIME,
         	SEND_FINISH_TIME
         ) VALUES 
@@ -85,6 +90,7 @@
 			#{item.content,jdbcType=LONGVARCHAR},
 			#{item.trxNo,jdbcType=VARCHAR},
 			#{item.status,jdbcType=TINYINT},
+			#{item.sendTimes,jdbcType=SMALLINT},
 			#{item.sendStartTime,jdbcType=TIMESTAMP},
 			#{item.sendFinishTime,jdbcType=TIMESTAMP}
 			)
@@ -103,6 +109,7 @@
 			CONTENT = #{content,jdbcType=LONGVARCHAR},
 			TRX_NO = #{trxNo,jdbcType=VARCHAR},
 			STATUS = #{status,jdbcType=TINYINT},
+			SEND_TIMES = #{sendTimes,jdbcType=SMALLINT},
 			SEND_START_TIME = #{sendStartTime,jdbcType=TIMESTAMP},
 			SEND_FINISH_TIME = #{sendFinishTime,jdbcType=TIMESTAMP}
 		</set>
@@ -135,6 +142,9 @@
 			<if test="status != null">
 				STATUS = #{status,jdbcType=TINYINT},
 			</if>
+			<if test="sendTimes != null">
+				SEND_TIMES = #{sendTimes,jdbcType=SMALLINT},
+			</if>
 			<if test="sendStartTime != null">
 				SEND_START_TIME = #{sendStartTime,jdbcType=TIMESTAMP},
 			</if>
@@ -144,7 +154,57 @@
 		</set>
 		WHERE ID = #{id,jdbcType=BIGINT} and VERSION = #{version,jdbcType=SMALLINT}
 	</update>
-	
+
+	<!-- 批量更新 -->
+	<update id="batchUpdate" parameterType="java.util.List">
+		UPDATE <include refid="table" />
+		<set>
+			CREATE_TIME = 
+			<foreach collection="list" item="item" index="index" open="(CASE ID" separator=" " close=" END)">
+				WHEN #{item.id,jdbcType=BIGINT} THEN #{item.createTime,jdbcType=TIMESTAMP}
+			</foreach>,
+			CREATE_DATE = 
+			<foreach collection="list" item="item" index="index" open="(CASE ID" separator=" " close=" END)">
+				WHEN #{item.id,jdbcType=BIGINT} THEN #{item.createDate,jdbcType=DATE}
+			</foreach>,
+			VERSION = VERSION + 1,
+			GROUP_KEY = 
+			<foreach collection="list" item="item" index="index" open="(CASE ID" separator=" " close=" END)">
+				WHEN #{item.id,jdbcType=BIGINT} THEN #{item.groupKey,jdbcType=VARCHAR}
+			</foreach>,
+			SUBJECT = 
+			<foreach collection="list" item="item" index="index" open="(CASE ID" separator=" " close=" END)">
+				WHEN #{item.id,jdbcType=BIGINT} THEN #{item.subject,jdbcType=VARCHAR}
+			</foreach>,
+			CONTENT = 
+			<foreach collection="list" item="item" index="index" open="(CASE ID" separator=" " close=" END)">
+				WHEN #{item.id,jdbcType=BIGINT} THEN #{item.content,jdbcType=LONGVARCHAR}
+			</foreach>,
+			TRX_NO = 
+			<foreach collection="list" item="item" index="index" open="(CASE ID" separator=" " close=" END)">
+				WHEN #{item.id,jdbcType=BIGINT} THEN #{item.trxNo,jdbcType=VARCHAR}
+			</foreach>,
+			STATUS = 
+			<foreach collection="list" item="item" index="index" open="(CASE ID" separator=" " close=" END)">
+				WHEN #{item.id,jdbcType=BIGINT} THEN #{item.status,jdbcType=TINYINT}
+			</foreach>,
+			SEND_TIMES = 
+			<foreach collection="list" item="item" index="index" open="(CASE ID" separator=" " close=" END)">
+				WHEN #{item.id,jdbcType=BIGINT} THEN #{item.sendTimes,jdbcType=SMALLINT}
+			</foreach>,
+			SEND_START_TIME = 
+			<foreach collection="list" item="item" index="index" open="(CASE ID" separator=" " close=" END)">
+				WHEN #{item.id,jdbcType=BIGINT} THEN #{item.sendStartTime,jdbcType=TIMESTAMP}
+			</foreach>,
+			SEND_FINISH_TIME = 
+			<foreach collection="list" item="item" index="index" open="(CASE ID" separator=" " close=" END)">
+				WHEN #{item.id,jdbcType=BIGINT} THEN #{item.sendFinishTime,jdbcType=TIMESTAMP}
+			</foreach>
+		</set>
+		WHERE ID IN <foreach collection="list" item="item" index="index" open="(" separator="," close=")">#{item.id,jdbcType=BIGINT}</foreach>
+		AND <foreach collection="list" item="item" index="index" open="(" separator=" OR " close=")">(ID = #{item.id,jdbcType=BIGINT} AND VERSION = #{item.version,jdbcType=SMALLINT})</foreach>
+	</update>
+
 	<!-- 多条件组合查询 -->
 	<select id="listBy" parameterType="java.util.Map" resultMap="BaseResultMap">
 		SELECT
@@ -242,6 +302,9 @@
 		<if test="status != null ">
 			AND STATUS = #{status,jdbcType=TINYINT}
 		</if>
+		<if test="sendTimes != null ">
+			AND SEND_TIMES = #{sendTimes,jdbcType=SMALLINT}
+		</if>
 		<if test="sendStartTime != null ">
 			AND SEND_START_TIME = #{sendStartTime,jdbcType=TIMESTAMP}
 		</if>
@@ -257,7 +320,7 @@
 		<where>
 			CREATE_DATE IN <foreach collection="createDateList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=DATE}</foreach>
 			AND STATUS = 1
-			AND CREATE_TIME &lt;= #{createTimeEnd,jdbcType=TIMESTAMP}
+			AND CREATE_TIME &lt;= #{createTimeEnd,jdbcType=TIMESTAMP} AND SEND_TIMES &lt; #{maxSendTimes,jdbcType=SMALLINT}
 		</where>
 	</select>
 	<select id="listSendingOvertimeRecord" parameterType="java.util.Map" resultMap="BaseResultMap">
@@ -266,14 +329,15 @@
 		<where>
 			CREATE_DATE IN <foreach collection="createDateList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=DATE}</foreach>
 			AND STATUS = 2
-			AND SEND_START_TIME IS NOT NULL AND SEND_START_TIME &lt;= #{sendStartTimeEnd,jdbcType=TIMESTAMP}
+			AND (SEND_START_TIME IS NOT NULL AND SEND_START_TIME &lt;= #{sendStartTimeEnd,jdbcType=TIMESTAMP})
+			AND SEND_TIMES &lt; #{maxSendTimes,jdbcType=SMALLINT}
 		</where>
 	</select>
-	<select id="listFinishOvertimeRecord" parameterType="java.util.Map" resultMap="BaseResultMap">
+	<select id="listFinishOrOvertimesRecord" parameterType="java.util.Map" resultMap="BaseResultMap">
 		SELECT <include refid="Base_Column_List" />
 		FROM <include refid="table" />
 		<where>
-			CREATE_DATE &lt;= #{createDateEnd,jdbcType=DATE} AND STATUS = 3
+			CREATE_DATE &lt;= #{createDateEnd,jdbcType=DATE} AND (STATUS = 3 OR SEND_TIMES &gt;= #{maxSendTimes,jdbcType=SMALLINT})
 		</where>
 	</select>
 	<update id="updatePendingToSending" parameterType="java.util.Map">
@@ -281,20 +345,11 @@
 		<set>
 			STATUS = 2,
 			VERSION = VERSION + 1,
+			SEND_TIMES = SEND_TIMES + 1,
 			SEND_START_TIME =#{sendStartTime,jdbcType=TIMESTAMP}
 		</set>
 		WHERE ID IN <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
 		AND STATUS = 1
-	</update>
-	<update id="revertSendingToPending" parameterType="java.util.Map">
-		UPDATE <include refid="table" />
-		<set>
-			STATUS = 1,
-			VERSION = VERSION + 1,
-			SEND_START_TIME = null
-		</set>
-		WHERE ID IN <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
-		AND STATUS = 2
 	</update>
 	<update id="updateSendingToFinish" parameterType="java.util.Map">
 		UPDATE <include refid="table" />
@@ -302,6 +357,16 @@
 			STATUS = 3,
 			VERSION = VERSION + 1,
 			SEND_FINISH_TIME =#{sendFinishTime,jdbcType=TIMESTAMP}
+		</set>
+		WHERE ID IN <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+		AND STATUS = 2
+	</update>
+	<update id="revertSendingToPending" parameterType="java.util.Map">
+		UPDATE <include refid="table" />
+		<set>
+			STATUS = 1,
+			VERSION = VERSION + 1,
+			SEND_START_TIME = null
 		</set>
 		WHERE ID IN <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
 		AND STATUS = 2

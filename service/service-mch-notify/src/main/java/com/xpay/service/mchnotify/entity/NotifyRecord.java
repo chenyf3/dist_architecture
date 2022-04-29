@@ -5,10 +5,12 @@ package com.xpay.service.mchnotify.entity;
 
 import com.xpay.common.service.annotations.PK;
 
+import java.io.Serializable;
+
 /**
  * 商户通知表
  */
-public class NotifyRecord {
+public class NotifyRecord implements Serializable {
 
 	//columns START
 	/**

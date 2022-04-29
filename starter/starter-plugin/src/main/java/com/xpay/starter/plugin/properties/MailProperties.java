@@ -76,7 +76,6 @@ public class MailProperties {
 		 */
 		private Map<String, String> properties = new HashMap<>();
 
-
 		public String getHost() {
 			return this.host;
 		}
@@ -138,6 +137,16 @@ public class MailProperties {
 		}
 
 		public Map<String, String> getProperties() {
+			//配置一些默认超时时间，避免一直阻塞
+			if(!this.properties.containsKey("mail.smtp.connectiontimeout")){//与邮件服务器建立连接的时间超时时间，单位毫秒
+				this.properties.put("mail.smtp.connectiontimeout", "10000");
+			}
+			if(!this.properties.containsKey("mail.smtp.timeout")){//接收邮件的超时时间，单位毫秒
+				this.properties.put("mail.smtp.timeout", "10000");
+			}
+			if(!this.properties.containsKey("mail.smtp.writetimeout")){//邮件发送时间，单位毫秒
+				this.properties.put("mail.smtp.writetimeout", "10000");
+			}
 			return this.properties;
 		}
 	}

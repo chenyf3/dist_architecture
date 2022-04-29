@@ -1,3 +1,6 @@
+/*
+ * Powered By [xpay.com]
+ */
 package com.xpay.service.message.entity;
 
 import com.xpay.common.service.annotations.PK;
@@ -7,7 +10,9 @@ import java.io.Serializable;
 /**
  * 邮件延迟发送
  */
-public class MailDelayRecord {
+public class MailDelayRecord implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	//columns START
 	/**
 	 * 自增ID
@@ -46,6 +51,10 @@ public class MailDelayRecord {
 	 * 状态(1=待发送 2=发送中 3=已发送)
 	 */
 	private Integer status;
+	/**
+	 * 发送次数
+	 */
+	private Integer sendTimes;
 	/**
 	 * 发送开始时间
 	 */
@@ -166,6 +175,18 @@ public class MailDelayRecord {
 		return this.status;
 	}
 	/**
+	 * 发送次数
+	 */
+	public void setSendTimes(Integer sendTimes) {
+		this.sendTimes = sendTimes;
+	}
+	/**
+	 * 发送次数
+	 */
+	public Integer getSendTimes() {
+		return this.sendTimes;
+	}
+	/**
 	 * 发送开始时间
 	 */
 	public void setSendStartTime(java.util.Date sendStartTime) {
@@ -189,4 +210,5 @@ public class MailDelayRecord {
 	public java.util.Date getSendFinishTime() {
 		return this.sendFinishTime;
 	}
+
 }

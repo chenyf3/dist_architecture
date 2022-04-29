@@ -7,7 +7,7 @@ import java.io.Serializable;
 /**
  * 商户密钥表
  */
-public class MerchantSecret {
+public class MerchantSecret implements Serializable {
 
 	//columns START
 	/**

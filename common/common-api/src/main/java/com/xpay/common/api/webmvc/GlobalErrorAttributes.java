@@ -118,13 +118,13 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
             String msg = fieldError.getDefaultMessage();
             strBuilder.append("验参失败，"+field+":"+msg+"");
             return true;
-        } else if (ex instanceof HttpMessageNotReadableException) {//参数类型转换错误时
+        } else if (ex instanceof HttpMessageNotReadableException) { //参数类型转换错误时
             strBuilder.append("请求参数无法转换或读取，请检查参数类型");
             return true;
-        } else if (ex instanceof HttpMediaTypeNotSupportedException) {//用户传入的MediaType与系统在方法上设置的不一致时
+        } else if (ex instanceof HttpMediaTypeNotSupportedException) { //用户传入的MediaType与系统在方法上设置的不一致时
             strBuilder.append("请参照接口文档选择合适的请求MediaType");
             return true;
-        } else if (ex instanceof HttpRequestMethodNotSupportedException) {//用户请求方式与系统在方法上设置的不一致时，如：方法要求POST但用法使用GET请求
+        } else if (ex instanceof HttpRequestMethodNotSupportedException) { //用户请求方式与系统在方法上设置的不一致时，如：方法要求POST但用法使用GET请求
             strBuilder.append("请参照接口文档选择合适的HTTP Method");
             return true;
         } else if (ex instanceof HttpMediaTypeNotAcceptableException) {
